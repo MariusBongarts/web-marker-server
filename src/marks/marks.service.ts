@@ -18,7 +18,6 @@ export class MarksService {
   }
 
   async getMarksForUrl(user: JwtPayload, url: string) {
-    console.log(url);
     return await this.markModel.find({ _user: user._id, url: url }).exec();
   }
 
@@ -27,9 +26,8 @@ export class MarksService {
   }
 
   async createMark(user: JwtPayload, mark: Mark) {
-    let createdMark = new this.markModel(mark);
+    const createdMark = new this.markModel(mark);
     createdMark._user = user._id;
-    //this.markGateway.createMark(createdMark);
     return await createdMark.save();
   }
 

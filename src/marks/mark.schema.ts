@@ -7,6 +7,7 @@ export const MarkSchema = new mongoose.Schema({
         required: true
     },
     _user: { type: mongoose.Schema.ObjectId, ref: 'User'},
+    _bookmark: { type: mongoose.Schema.ObjectId, ref: 'Bookmark'},
     createdAt: Number,
     url: String,
     origin: String,

@@ -9,6 +9,8 @@ import { UsersModule } from './users/users.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MarksModule } from './marks/marks.module';
+import { BookmarksController } from './bookmarks/bookmarks.controller';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { MarksModule } from './marks/marks.module';
     AuthModule,
     UsersModule,
     MarksModule,
+    BookmarksModule,
     ConfigModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
