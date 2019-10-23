@@ -9,6 +9,7 @@ export const MarkSchema = new mongoose.Schema({
     },
     _user: { type: mongoose.Schema.ObjectId, ref: 'User'},
     _bookmark: { type: mongoose.Schema.ObjectId, ref: 'Bookmark'},
+    _directory: { type: mongoose.Schema.ObjectId, ref: 'Directory'},
     createdAt: Number,
     url: String,
     origin: String,

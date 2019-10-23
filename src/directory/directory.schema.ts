@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 
-export const BookmarkSchema = new mongoose.Schema({
+export const DirectorySchema = new mongoose.Schema({
     id: {
         type: String,
         unique: true,
@@ -8,10 +8,8 @@ export const BookmarkSchema = new mongoose.Schema({
     },
     _user: { type: mongoose.Schema.ObjectId, ref: 'User'},
     _directory: { type: mongoose.Schema.ObjectId, ref: 'Directory'},
+    _parentDirectory: { type: mongoose.Schema.ObjectId, ref: 'Directory'},
     createdAt: Number,
-    isStarred: Boolean,
-    origin: String,
-    tags: [String],
-    title: String,
-    url: String
+    name: String,
+    index: Number
 });

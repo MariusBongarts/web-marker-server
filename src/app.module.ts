@@ -11,6 +11,9 @@ import { join } from 'path';
 import { MarksModule } from './marks/marks.module';
 import { BookmarksController } from './bookmarks/bookmarks.controller';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
+import { DirectoryController } from './directory/directory.controller';
+import { DirectoryService } from './directory/directory.service';
+import { DirectoryModule } from './directory/directory.module';
 
 @Module({
   imports: [
@@ -23,6 +26,7 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
     UsersModule,
     MarksModule,
     BookmarksModule,
+    DirectoryModule,
     ConfigModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -31,7 +35,8 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
         useNewUrlParser: true
       }),
       inject: [ConfigService],
-    })
+    }),
+    DirectoryModule
   ],
   controllers: [AppController],
   providers: [AppService],
