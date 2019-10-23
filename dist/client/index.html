@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Mark my words</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link href="main.css" rel="stylesheet"></head>
+
+<body>
+  <app-root></app-root>
+<script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="main.js"></script></body>
+
+<script>
+  setTimeout(() => {
+
+    try {
+      document.body.getElementsByTagName('pop-up')[0].remove();
+      document.body.getElementsByTagName('web-marker')[0].remove();
+    } catch (error) {
+      //
+    }
+  },200)
+</script>
+
+
+
+</html>
