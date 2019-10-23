@@ -1,3 +1,5 @@
+import { BookmarksModule } from './../bookmarks/bookmarks.module';
+import { BookmarksService } from './../bookmarks/bookmarks.service';
 import { MarkGateway } from './mark.gateway';
 import { UsersModule } from './../users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -11,7 +13,8 @@ import { MarksService } from './marks.service';
   imports: [
     MongooseModule.forFeature([{ name: 'Mark', schema: MarkSchema }]),
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
-    UsersModule
+    UsersModule,
+    BookmarksModule
   ],
   exports: [MarksService],
   providers: [MarksService, MarkGateway],

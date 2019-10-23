@@ -1,3 +1,4 @@
+import { Bookmark } from './../bookmarks/bookmark.interface';
 import * as mongoose from 'mongoose';
 
 export const MarkSchema = new mongoose.Schema({

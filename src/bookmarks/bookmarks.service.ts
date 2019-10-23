@@ -19,13 +19,19 @@ export class BookmarksService {
   }
 
   async findBookmarkById(user: JwtPayload, bookmarkId: string) {
-    return await this.bookmarkModel.findOne({ _user: user._id, id: bookmarkId });
+    return await this.bookmarkModel.findOne({ _user: user._id, id: bookmarkId }).exec();
   }
 
-  async createBookmark(user: JwtPayload, bookmark: Bookmark) {
+  // Creates a bookmark if no bookmark for url exists
+  async createBookmarkIfNotExists(user: JwtPayload, bookmark: Bookmark) {
+    const existingBookmark = await this.getBookmarkForUrl(user, bookmark.url);
+    if (!existingBookmark) {
     const createdBookmark = new this.bookmarkModel(bookmark);
     createdBookmark._user = user._id;
     return await createdBookmark.save();
+    } else {
+      return existingBookmark;
+    }
   }
 
   async deleteBookmark(user: JwtPayload, markId: string) {

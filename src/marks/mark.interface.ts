@@ -1,3 +1,4 @@
+import { Bookmark } from './../bookmarks/bookmark.interface';
 import { Entity } from './../models/entity';
 export interface Mark extends Entity {
   url: string;
@@ -15,4 +16,5 @@ export interface Mark extends Entity {
   title: string;
   _user?: string;
   scrollY: number;
+  bookmark: Bookmark;
 }
