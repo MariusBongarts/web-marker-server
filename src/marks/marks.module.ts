@@ -6,7 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MarkSchema } from './mark.schema';
 import { MarksController } from './marks.controller';
 import { PassportModule } from '@nestjs/passport';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MarksService } from './marks.service';
 
 @Module({
@@ -14,7 +14,7 @@ import { MarksService } from './marks.service';
     MongooseModule.forFeature([{ name: 'Mark', schema: MarkSchema }]),
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
     UsersModule,
-    BookmarksModule
+    forwardRef(() => BookmarksModule)
   ],
   exports: [MarksService],
   providers: [MarksService, MarkGateway],

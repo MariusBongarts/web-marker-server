@@ -41,7 +41,7 @@ export class BookmarksController {
   @Post('')
   @UseGuards(AuthGuard())
   async createBookmark(@UserJwt() userJwt: JwtPayload, @Body() bookmark, @Req() req) {
-    const createdBookmark = await this.bookmarkService.createBookmark(userJwt, bookmark);
+    const createdBookmark = await this.bookmarkService.createBookmarkIfNotExists(userJwt, bookmark);
     this.logger.log(`${userJwt.email} created bookmark ${bookmark.id}.`);
     return createdBookmark;
   }

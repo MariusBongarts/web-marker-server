@@ -4,16 +4,23 @@ import { JwtPayload } from './../auth/interfaces/jwt-payload.interface';
 import { User } from './../users/user.interface';
 import { Mark } from './mark.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Model } from 'mongoose';
+import { ModuleRef } from '@nestjs/core';
 
 @Injectable()
-export class MarksService {
+export class MarksService implements OnModuleInit {
+  private bookmarkService: BookmarksService;
+
   constructor(
     @InjectModel('Mark') private markModel: Model<Mark>,
-    private bookmarkService: BookmarksService,
-    private markGateway: MarkGateway
-    ) { }
+    private markGateway: MarkGateway,
+    private readonly moduleRef: ModuleRef
+  ) { }
+
+  onModuleInit() {
+    this.bookmarkService = this.moduleRef.get(BookmarksService, { strict: false });
+  }
 
   async getMarksForUser(user: JwtPayload) {
     return await this.markModel.find({ _user: user._id }).exec();

@@ -6,8 +6,8 @@ export const BookmarkSchema = new mongoose.Schema({
         unique: true,
         required: true
     },
-    _user: { type: mongoose.Schema.ObjectId, ref: 'User'},
-    _directory: { type: mongoose.Schema.ObjectId, ref: 'Directory'},
+    _user: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    _directory: { type: mongoose.Schema.Types.ObjectId, ref: 'Directory'},
     createdAt: Number,
     isStarred: Boolean,
     origin: String,

@@ -7,7 +7,7 @@ exports.MarkSchema = new mongoose.Schema({
         unique: true,
         required: true
     },
-    _user: { type: mongoose.Schema.ObjectId, ref: 'User' },
+    _user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     createdAt: Number,
     url: String,
     origin: String,

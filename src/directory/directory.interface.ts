@@ -6,5 +6,4 @@ export interface Directory extends Document {
   _directory?: string;
   _parentDirectory?: string;
   name: string;
-  index: number;
 }

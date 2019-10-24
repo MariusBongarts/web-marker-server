@@ -1,16 +1,25 @@
+import { ModuleRef } from '@nestjs/core';
+import { MarksService } from './../marks/marks.service';
 import { Mark } from './../marks/mark.interface';
 import { Bookmark } from './bookmark.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject, OnModuleInit } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { JwtPayload } from './../auth/interfaces/jwt-payload.interface';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()
-export class BookmarksService {
+export class BookmarksService implements OnModuleInit  {
+  private markService: MarksService;
   constructor(
-    @InjectModel('Bookmark') private bookmarkModel: Model<Bookmark>
+    @InjectModel('Bookmark') private bookmarkModel: Model<Bookmark>,
+    private readonly moduleRef: ModuleRef
+
   ) { }
+
+  onModuleInit() {
+    this.markService = this.moduleRef.get(MarksService, { strict: false });
+  }
 
   async getBookmarksForUser(user: JwtPayload) {
     return await this.bookmarkModel.find({ _user: user._id }).exec();
@@ -36,12 +45,29 @@ export class BookmarksService {
     }
   }
 
-  async deleteBookmark(user: JwtPayload, markId: string) {
-    return await this.bookmarkModel.deleteOne({ _user: user._id, id: markId });
+  async deleteBookmark(user: JwtPayload, bookmarkId: string) {
+    return await this.bookmarkModel.deleteOne({ _user: user._id, _id: bookmarkId });
   }
 
+  /**
+   * Updates bookmark unless isStarred attribute changed to false AND there are no marks for this bookmark
+   *
+   * @param {JwtPayload} user
+   * @param {Bookmark} bookmark
+   * @returns
+   * @memberof BookmarksService
+   */
   async updateBookmark(user: JwtPayload, bookmark: Bookmark) {
-    return await this.bookmarkModel.updateOne({ _user: user._id, id: bookmark.id }, bookmark);
+    // Find bookmark in database to get ObjectId
+    const oldBookmark = await this.bookmarkModel.findOne({ _user: user._id, id: bookmark.id }).exec();
+    const marksForBookmark = await this.markService.getMarksForBookmarkId(user, oldBookmark._id);
+
+    // If no marks for bookmark and it is not starred, it will be deleted
+    if (!bookmark.isStarred && marksForBookmark.length === 0) {
+      await this.deleteBookmark(user, oldBookmark._id);
+    } else {
+      return await this.bookmarkModel.updateOne({ _user: user._id, id: bookmark.id }, bookmark);
+    }
   }
 
   /**
