@@ -1,6 +1,7 @@
-import { Entity } from './../models/entity';
-
-export interface Bookmark extends Entity {
+import { Document} from 'mongoose';
+export interface Bookmark extends Document {
+  id: string;
+  createdAt: number;
   _user?: string;
   _directory?: string;
   isStarred: boolean;

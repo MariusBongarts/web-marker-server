@@ -42,14 +42,14 @@ export class DirectoryController {
   @UseGuards(AuthGuard())
   async deleteDirectory(@UserJwt() userJwt: JwtPayload, @Param('id') directoryId, @Req() req) {
     const deletedDirectory = await this.directoryService.deleteDirectory(userJwt, directoryId);
-    this.logger.log(`${userJwt.email} deleted bookmark ${deletedDirectory.name}.`);
+    this.logger.log(`${userJwt.email} deleted directory ${deletedDirectory.name}.`);
     return deletedDirectory;
   }
 
   @Put('')
   @UseGuards(AuthGuard())
   async updateDirectory(@UserJwt() userJwt: JwtPayload, @Body() directory, @Req() req) {
-    this.logger.log(`${userJwt.email} updated bookmark ${directory.name}.`);
+    this.logger.log(`${userJwt.email} updated directory ${directory.name}.`);
     return await this.directoryService.updateDirectory(userJwt, directory);
   }
 

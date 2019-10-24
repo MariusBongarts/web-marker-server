@@ -1,6 +1,7 @@
-import { Bookmark } from './../bookmarks/bookmark.interface';
-import { Entity } from './../models/entity';
-export interface Mark extends Entity {
+import { Document} from 'mongoose';
+export interface Mark extends Document {
+  id: string;
+  createdAt: number;
   url: string;
   origin: string;
   text: string;
@@ -16,6 +17,6 @@ export interface Mark extends Entity {
   title: string;
   _user?: string;
   _directory?: string;
+  _bookmark?: string;
   scrollY: number;
-  bookmark: Bookmark;
 }
