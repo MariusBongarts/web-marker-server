@@ -88,7 +88,7 @@ export class MarksService implements OnModuleInit {
     if (marksForBookmark.length === 0) {
       const bookmark = await this.bookmarkService.findBookmarkById(user, mark._bookmark);
       if (!bookmark.isStarred) {
-        await this.bookmarkService.deleteBookmark(user, bookmark.id);
+        await this.bookmarkService.deleteBookmark(user, bookmark._id);
       }
     }
   }
