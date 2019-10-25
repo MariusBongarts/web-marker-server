@@ -19,6 +19,7 @@ export class AuthService {
         return new Promise((resolve) => {
 
             // Check the supplied password against the hash stored for this email address
+            // @ts-ignore
             userToAttempt.checkPassword(loginAttempt.password, (err, isMatch) => {
 
                 if (err) {
