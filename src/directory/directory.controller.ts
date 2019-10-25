@@ -42,7 +42,7 @@ export class DirectoryController {
   @UseGuards(AuthGuard())
   async deleteDirectory(@UserJwt() userJwt: JwtPayload, @Param('id') directoryId, @Req() req) {
     const deletedDirectory = await this.directoryService.deleteDirectory(userJwt, directoryId);
-    this.logger.log(`${userJwt.email} deleted directory ${deletedDirectory.name}.`);
+    this.logger.log(`${userJwt.email} deleted directory ${directoryId}.`);
     return deletedDirectory;
   }
 
