@@ -7,6 +7,6 @@ export declare class UsersService {
     private configService;
     private logger;
     constructor(userModel: Model<User>, configService: ConfigService);
-    create(createUserDto: CreateUserDto): Promise<any>;
-    findOneByEmail(email: any): Model<User>;
+    create(createUserDto: CreateUserDto): Promise<User>;
+    findOneByEmail(email: any): Promise<User>;
 }

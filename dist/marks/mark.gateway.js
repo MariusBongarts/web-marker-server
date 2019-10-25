@@ -57,6 +57,9 @@ let MarkGateway = class MarkGateway {
         const userId = this.getJwtPayloadForClient(client)._id;
         this.wss.in(userId).emit(eventName, data);
     }
+    emitToClientByUserId(userId, eventName, data) {
+        this.wss.in(userId).emit(eventName, data);
+    }
     emitToAllClients(eventName, data) {
         this.wss.emit(eventName, data);
     }

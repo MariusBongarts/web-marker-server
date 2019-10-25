@@ -12,6 +12,7 @@ export declare class MarkGateway implements OnGatewayConnection, OnGatewayDiscon
     onDeleteMark(client: any, markId: string): Promise<void>;
     onUpdateMark(client: any, mark: Mark): Promise<void>;
     emitToOneClient(client: Socket, eventName: string, data: any): void;
+    emitToClientByUserId(userId: string, eventName: string, data: any): void;
     emitToAllClients(eventName: string, data: any): void;
     getJwtPayloadForClient(client: Socket): JwtPayload;
 }

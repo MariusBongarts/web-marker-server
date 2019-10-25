@@ -21,6 +21,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const mark_gateway_1 = require("./mark.gateway");
 const users_service_1 = require("./../users/users.service");
 const marks_service_1 = require("./marks.service");
 const email_decorator_1 = require("./../users/decorators/email.decorator");
@@ -28,9 +29,10 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const common_2 = require("@nestjs/common");
 let MarksController = class MarksController {
-    constructor(marksService, usersService) {
+    constructor(marksService, usersService, markGateway) {
         this.marksService = marksService;
         this.usersService = usersService;
+        this.markGateway = markGateway;
         this.logger = new common_2.Logger('MarksController');
     }
     getMarks(userJwt, req) {
@@ -56,6 +58,7 @@ let MarksController = class MarksController {
     }
     createMark(userJwt, mark, req) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.markGateway.emitToClientByUserId(userJwt._id, 'createMark', mark);
             const createdMark = yield this.marksService.createMark(userJwt, mark);
             this.logger.log(`${userJwt.email} created mark ${mark.id} from ${req.get('origin')}.`);
             return createdMark;
@@ -63,6 +66,7 @@ let MarksController = class MarksController {
     }
     deleteMark(userJwt, markId, req) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.markGateway.emitToClientByUserId(userJwt._id, 'deleteMark', markId);
             const deletedMark = yield this.marksService.deleteMark(userJwt, markId);
             this.logger.log(`${userJwt.email} deleted mark ${markId} from ${req.get('origin')}.`);
             return deletedMark;
@@ -70,6 +74,7 @@ let MarksController = class MarksController {
     }
     updateMark(userJwt, mark, req) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.markGateway.emitToClientByUserId(userJwt._id, 'updateMark', mark);
             this.logger.log(`${userJwt.email} updated mark ${mark.id} from ${req.get('origin')}.`);
             return yield this.marksService.updateMark(userJwt, mark);
         });
@@ -126,7 +131,8 @@ __decorate([
 MarksController = __decorate([
     common_1.Controller('marks'),
     __metadata("design:paramtypes", [marks_service_1.MarksService,
-        users_service_1.UsersService])
+        users_service_1.UsersService,
+        mark_gateway_1.MarkGateway])
 ], MarksController);
 exports.MarksController = MarksController;
 //# sourceMappingURL=marks.controller.js.map

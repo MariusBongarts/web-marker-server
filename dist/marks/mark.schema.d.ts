@@ -1,1 +1,2 @@
-export declare const MarkSchema: any;
+import * as mongoose from 'mongoose';
+export declare const MarkSchema: mongoose.Schema<any>;

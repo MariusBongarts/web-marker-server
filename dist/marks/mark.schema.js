@@ -8,6 +8,8 @@ exports.MarkSchema = new mongoose.Schema({
         required: true
     },
     _user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    _bookmark: { type: mongoose.Schema.Types.ObjectId, ref: 'Bookmark' },
+    _directory: { type: mongoose.Schema.Types.ObjectId, ref: 'Directory' },
     createdAt: Number,
     url: String,
     origin: String,

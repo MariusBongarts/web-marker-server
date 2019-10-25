@@ -26,6 +26,8 @@ const users_module_1 = require("./users/users.module");
 const serve_static_1 = require("@nestjs/serve-static");
 const path_1 = require("path");
 const marks_module_1 = require("./marks/marks.module");
+const bookmarks_module_1 = require("./bookmarks/bookmarks.module");
+const directory_module_1 = require("./directory/directory.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -39,6 +41,8 @@ AppModule = __decorate([
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             marks_module_1.MarksModule,
+            bookmarks_module_1.BookmarksModule,
+            directory_module_1.DirectoryModule,
             config_module_1.ConfigModule,
             mongoose_1.MongooseModule.forRootAsync({
                 imports: [config_module_1.ConfigModule],
@@ -49,7 +53,8 @@ AppModule = __decorate([
                     });
                 }),
                 inject: [config_service_1.ConfigService],
-            })
+            }),
+            directory_module_1.DirectoryModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

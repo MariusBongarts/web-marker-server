@@ -20,7 +20,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_service_1 = require("./../config/config.service");
 const mongoose_1 = require("mongoose");
@@ -48,7 +47,7 @@ let UsersService = class UsersService {
 UsersService = __decorate([
     common_1.Injectable(),
     __param(0, mongoose_2.InjectModel('User')),
-    __metadata("design:paramtypes", [typeof (_a = typeof mongoose_1.Model !== "undefined" && mongoose_1.Model) === "function" ? _a : Object, config_service_1.ConfigService])
+    __metadata("design:paramtypes", [mongoose_1.Model, config_service_1.ConfigService])
 ], UsersService);
 exports.UsersService = UsersService;
 //# sourceMappingURL=users.service.js.map

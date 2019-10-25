@@ -1,5 +1,5 @@
+import { JwtPayload } from './../auth/interfaces/jwt-payload.interface';
 import { UsersService } from './../users/users.service';
-import { JwtPayload } from './../../dist/auth/interfaces/jwt-payload.interface.d';
 import { UserJwt } from './../users/decorators/email.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { Controller, Get, Post, Body, UseGuards, Req, Delete, Param, Put, Query, Logger } from '@nestjs/common';

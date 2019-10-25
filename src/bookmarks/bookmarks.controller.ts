@@ -1,4 +1,4 @@
-import { JwtPayload } from './../../dist/auth/interfaces/jwt-payload.interface.d';
+import { JwtPayload } from './../auth/interfaces/jwt-payload.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { UserJwt } from './../users/decorators/email.decorator';
 import { UsersService } from './../users/users.service';

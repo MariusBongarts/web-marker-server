@@ -14,25 +14,29 @@ exports.UserSchema = new mongoose.Schema({
     }
 });
 exports.UserSchema.pre('save', function (next) {
-    let user = this;
-    if (!user.isModified('password'))
+    const user = this;
+    if (!user.isModified('password')) {
         return next();
+    }
     bcrypt.genSalt(10, (err, salt) => {
-        if (err)
+        if (err) {
             return next(err);
+        }
         bcrypt.hash(user.password, salt, (err, hash) => {
-            if (err)
+            if (err) {
                 return next(err);
+            }
             user.password = hash;
             next();
         });
     });
 });
 exports.UserSchema.methods.checkPassword = function (attempt, callback) {
-    let user = this;
+    const user = this;
     bcrypt.compare(attempt, user.password, (err, isMatch) => {
-        if (err)
+        if (err) {
             return callback(err);
+        }
         callback(null, isMatch);
     });
 };

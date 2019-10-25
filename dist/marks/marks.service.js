@@ -20,16 +20,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
+const bookmarks_service_1 = require("./../bookmarks/bookmarks.service");
 const mark_gateway_1 = require("./mark.gateway");
 const mongoose_1 = require("@nestjs/mongoose");
 const common_1 = require("@nestjs/common");
 const mongoose_2 = require("mongoose");
+const core_1 = require("@nestjs/core");
 let MarksService = class MarksService {
-    constructor(markModel, markGateway) {
+    constructor(markModel, markGateway, moduleRef) {
         this.markModel = markModel;
         this.markGateway = markGateway;
+        this.moduleRef = moduleRef;
+    }
+    onModuleInit() {
+        this.bookmarkService = this.moduleRef.get(bookmarks_service_1.BookmarksService, { strict: false });
     }
     getMarksForUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -38,8 +43,12 @@ let MarksService = class MarksService {
     }
     getMarksForUrl(user, url) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(url);
             return yield this.markModel.find({ _user: user._id, url: url }).exec();
+        });
+    }
+    getMarksForBookmarkId(user, bookmarkId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.markModel.find({ _user: user._id, _bookmark: bookmarkId }).exec();
         });
     }
     findMarkById(user, markId) {
@@ -49,14 +58,20 @@ let MarksService = class MarksService {
     }
     createMark(user, mark) {
         return __awaiter(this, void 0, void 0, function* () {
-            let createdMark = new this.markModel(mark);
+            const createdMark = new this.markModel(mark);
             createdMark._user = user._id;
+            const newBookmark = this.bookmarkService.createBookMarkFromMark(mark);
+            const bookmark = yield this.bookmarkService.createBookmarkIfNotExists(user, newBookmark);
+            createdMark._bookmark = bookmark._id;
             return yield createdMark.save();
         });
     }
     deleteMark(user, markId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.markModel.deleteOne({ _user: user._id, id: markId });
+            const mark = yield this.findMarkById(user, markId);
+            const deleteResult = yield this.markModel.deleteOne({ _user: user._id, id: markId });
+            yield this.deleteBookmarkIfNoMarks(user, mark);
+            return deleteResult;
         });
     }
     updateMark(user, mark) {
@@ -64,11 +79,24 @@ let MarksService = class MarksService {
             return yield this.markModel.updateOne({ _user: user._id, id: mark.id }, mark);
         });
     }
+    deleteBookmarkIfNoMarks(user, mark) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const marksForBookmark = yield this.getMarksForBookmarkId(user, mark._bookmark);
+            if (marksForBookmark.length === 0) {
+                const bookmark = yield this.bookmarkService.findBookmarkById(user, mark._bookmark);
+                if (!bookmark.isStarred) {
+                    yield this.bookmarkService.deleteBookmark(user, bookmark._id);
+                }
+            }
+        });
+    }
 };
 MarksService = __decorate([
     common_1.Injectable(),
     __param(0, mongoose_1.InjectModel('Mark')),
-    __metadata("design:paramtypes", [typeof (_a = typeof mongoose_2.Model !== "undefined" && mongoose_2.Model) === "function" ? _a : Object, mark_gateway_1.MarkGateway])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mark_gateway_1.MarkGateway,
+        core_1.ModuleRef])
 ], MarksService);
 exports.MarksService = MarksService;
 //# sourceMappingURL=marks.service.js.map
