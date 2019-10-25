@@ -26,9 +26,11 @@ UserSchema.pre('save', function(next) {
 
         if (err) { return next(err); }
 
+        // @ts-ignore
         bcrypt.hash(user.password, salt, (err: any, hash) => {
 
             if (err) { return next(err); }
+            // @ts-ignore
             user.password = hash;
             next();
 
@@ -38,7 +40,7 @@ UserSchema.pre('save', function(next) {
 
 });
 
-UserSchema.methods.checkPassword = function(attempt, callback) {
+UserSchema.methods.checkPassword = function (attempt, callback) {
 
     const user = this;
 
