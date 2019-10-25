@@ -9,7 +9,7 @@ import { JwtPayload } from './../auth/interfaces/jwt-payload.interface';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()
-export class BookmarksService implements OnModuleInit  {
+export class BookmarksService implements OnModuleInit {
   private markService: MarksService;
   constructor(
     @InjectModel('Bookmark') private bookmarkModel: Model<Bookmark>,
@@ -60,10 +60,15 @@ export class BookmarksService implements OnModuleInit  {
   async updateBookmark(user: JwtPayload, bookmark: Bookmark) {
     // Find bookmark in database to get ObjectId
     const oldBookmark = await this.bookmarkModel.findOne({ _user: user._id, id: bookmark.id }).exec();
-    const marksForBookmark = await this.markService.getMarksForBookmarkId(user, oldBookmark._id);
+
+    let marksForBookmark;
+
+    if (oldBookmark) {
+      marksForBookmark = await this.markService.getMarksForBookmarkId(user, oldBookmark._id);
+    }
 
     // If no marks for bookmark and it is not starred, it will be deleted
-    if (!bookmark.isStarred && marksForBookmark.length === 0) {
+    if (oldBookmark && (!marksForBookmark || marksForBookmark.length === 0) && !bookmark.isStarred) {
       await this.deleteBookmark(user, oldBookmark._id);
     } else {
       return await this.bookmarkModel.updateOne({ _user: user._id, id: bookmark.id }, bookmark);
