@@ -76,6 +76,7 @@ let MarksService = class MarksService {
     }
     updateMark(user, mark) {
         return __awaiter(this, void 0, void 0, function* () {
+            mark.tags = [...new Set([...mark.tags])];
             return yield this.markModel.updateOne({ _user: user._id, id: mark.id }, mark);
         });
     }

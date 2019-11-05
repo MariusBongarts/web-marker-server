@@ -58,6 +58,10 @@ export class BookmarksService implements OnModuleInit {
    * @memberof BookmarksService
    */
   async updateBookmark(user: JwtPayload, bookmark: Bookmark) {
+
+    // Secure that tags are distinct
+    bookmark.tags = [...new Set([...bookmark.tags])];
+
     // Find bookmark in database to get ObjectId
     const oldBookmark = await this.bookmarkModel.findOne({ _user: user._id, id: bookmark.id }).exec();
 

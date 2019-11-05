@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const fs = require("fs");
 class ConfigService {
     constructor(filePath) {
-        this.envConfig = dotenv.parse(fs.readFileSync(filePath));
+        this.envConfig = dotenv.parse(fs.readFileSync(filePath.split(' ').join('')));
     }
     get(key) {
         return this.envConfig[key];

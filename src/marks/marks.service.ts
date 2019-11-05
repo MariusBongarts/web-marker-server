@@ -73,6 +73,9 @@ export class MarksService implements OnModuleInit {
   }
 
   async updateMark(user: JwtPayload, mark: Mark) {
+    // Secure that tags are distinct
+    mark.tags = [...new Set([...mark.tags])];
+
     return await this.markModel.updateOne({ _user: user._id, id: mark.id }, mark);
   }
 
