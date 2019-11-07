@@ -37,7 +37,7 @@ export class MarksController {
 
     // Save url visit in database as a log entry.
     if (url) {
-      await this.loggerService.createLog(userJwt, url);
+      this.loggerService.createLog(userJwt, url);
     }
 
     // Print log
