@@ -33,11 +33,13 @@ export class MarksController {
   async getMarks(@UserJwt() userJwt: JwtPayload, @Req() req) {
     const marks = await this.marksService.getMarksForUser(userJwt);
 
+    const url = req.headers.referer ? req.headers.referer : req.get('origin');
+
     // Save url visit in database as a log entry. This can be done synchronously one does not have to wait for this to complete
-    this.loggerService.createLog(userJwt, req.get('origin'));
+    this.loggerService.createLog(userJwt, url);
 
     // Print log
-    this.logger.log(`${userJwt.email} loaded ${marks.length} marks from ${req.get('origin')}.`);
+    this.logger.log(`${userJwt.email} loaded ${marks.length} marks from ${url}.`);
     return marks;
   }
 
