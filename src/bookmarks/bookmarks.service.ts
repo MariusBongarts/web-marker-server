@@ -14,7 +14,6 @@ export class BookmarksService implements OnModuleInit {
   constructor(
     @InjectModel('Bookmark') private bookmarkModel: Model<Bookmark>,
     private readonly moduleRef: ModuleRef
-
   ) { }
 
   onModuleInit() {

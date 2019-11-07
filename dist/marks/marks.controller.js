@@ -21,6 +21,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const logger_service_1 = require("./../logger/logger.service");
 const mark_gateway_1 = require("./mark.gateway");
 const users_service_1 = require("./../users/users.service");
 const marks_service_1 = require("./marks.service");
@@ -29,15 +30,19 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const common_2 = require("@nestjs/common");
 let MarksController = class MarksController {
-    constructor(marksService, usersService, markGateway) {
+    constructor(marksService, usersService, loggerService, markGateway) {
         this.marksService = marksService;
         this.usersService = usersService;
+        this.loggerService = loggerService;
         this.markGateway = markGateway;
         this.logger = new common_2.Logger('MarksController');
     }
     getMarks(userJwt, req) {
         return __awaiter(this, void 0, void 0, function* () {
             const marks = yield this.marksService.getMarksForUser(userJwt);
+            this.loggerService.createLog(userJwt, req.get('origin'));
+            const logs = yield this.loggerService.getLogs();
+            console.log(logs);
             this.logger.log(`${userJwt.email} loaded ${marks.length} marks from ${req.get('origin')}.`);
             return marks;
         });
@@ -132,6 +137,7 @@ MarksController = __decorate([
     common_1.Controller('marks'),
     __metadata("design:paramtypes", [marks_service_1.MarksService,
         users_service_1.UsersService,
+        logger_service_1.LoggerService,
         mark_gateway_1.MarkGateway])
 ], MarksController);
 exports.MarksController = MarksController;

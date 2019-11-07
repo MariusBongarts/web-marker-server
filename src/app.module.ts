@@ -14,6 +14,8 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { DirectoryController } from './directory/directory.controller';
 import { DirectoryService } from './directory/directory.service';
 import { DirectoryModule } from './directory/directory.module';
+import { LoggerService } from './logger/logger.service';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { DirectoryModule } from './directory/directory.module';
     BookmarksModule,
     DirectoryModule,
     ConfigModule,
+    LoggerModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -36,7 +39,8 @@ import { DirectoryModule } from './directory/directory.module';
       }),
       inject: [ConfigService],
     }),
-    DirectoryModule
+    DirectoryModule,
+    LoggerModule
   ],
   controllers: [AppController],
   providers: [AppService],

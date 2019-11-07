@@ -1,3 +1,4 @@
+import { LoggerService } from './../logger/logger.service';
 import { Client } from 'socket.io';
 import { MarkGateway } from './mark.gateway';
 import { JwtPayload } from './../auth/interfaces/jwt-payload.interface';
@@ -16,6 +17,7 @@ export class MarksController {
   constructor(
     private marksService: MarksService,
     private usersService: UsersService,
+    private loggerService: LoggerService,
     private markGateway: MarkGateway) {
     }
 
@@ -30,6 +32,11 @@ export class MarksController {
   @UseGuards(AuthGuard())
   async getMarks(@UserJwt() userJwt: JwtPayload, @Req() req) {
     const marks = await this.marksService.getMarksForUser(userJwt);
+
+    // Save url visit in database as a log entry. This can be done synchronously one does not have to wait for this to complete
+    this.loggerService.createLog(userJwt, req.get('origin'));
+
+    // Print log
     this.logger.log(`${userJwt.email} loaded ${marks.length} marks from ${req.get('origin')}.`);
     return marks;
   }
