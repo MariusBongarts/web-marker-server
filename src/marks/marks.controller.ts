@@ -36,7 +36,9 @@ export class MarksController {
     const url = req.headers.referer ? req.headers.referer : req.get('origin');
 
     // Save url visit in database as a log entry. This can be done synchronously one does not have to wait for this to complete
-    this.loggerService.createLog(userJwt, url);
+    if (url) {
+      this.loggerService.createLog(userJwt, url);
+    }
 
     // Print log
     this.logger.log(`${userJwt.email} loaded ${marks.length} marks from ${url}.`);
