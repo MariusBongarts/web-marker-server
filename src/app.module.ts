@@ -16,6 +16,7 @@ import { DirectoryService } from './directory/directory.service';
 import { DirectoryModule } from './directory/directory.module';
 import { LoggerService } from './logger/logger.service';
 import { LoggerModule } from './logger/logger.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
   imports: [
@@ -40,7 +41,8 @@ import { LoggerModule } from './logger/logger.module';
       inject: [ConfigService],
     }),
     DirectoryModule,
-    LoggerModule
+    LoggerModule,
+    TagModule
   ],
   controllers: [AppController],
   providers: [AppService],

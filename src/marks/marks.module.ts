@@ -1,3 +1,4 @@
+import { TagModule } from './../tag/tag.module';
 import { LoggerModule } from './../logger/logger.module';
 import { BookmarksModule } from './../bookmarks/bookmarks.module';
 import { BookmarksService } from './../bookmarks/bookmarks.service';
@@ -16,6 +17,7 @@ import { MarksService } from './marks.service';
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
     UsersModule,
     LoggerModule,
+    TagModule,
     forwardRef(() => BookmarksModule)
   ],
   exports: [MarksService],

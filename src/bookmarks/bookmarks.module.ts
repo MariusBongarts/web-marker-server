@@ -1,3 +1,4 @@
+import { TagModule } from './../tag/tag.module';
 import { MarksModule } from './../marks/marks.module';
 import { MarksService } from './../marks/marks.service';
 import { UsersModule } from './../users/users.module';
@@ -13,6 +14,7 @@ import { BookmarksService } from './bookmarks.service';
     MongooseModule.forFeature([{ name: 'Bookmark', schema: BookmarkSchema }]),
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
     UsersModule,
+    TagModule,
     forwardRef(() => MarksModule)
   ],
   exports: [BookmarksService],

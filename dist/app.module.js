@@ -39,11 +39,6 @@ AppModule = __decorate([
                 renderPath: '',
                 serveStaticOptions: {}
             }),
-            serve_static_1.ServeStaticModule.forRoot({
-                rootPath: path_1.join(__dirname, '..', 'datenschutzerklaerung'),
-                renderPath: '/datenschutzerklaerung',
-                serveStaticOptions: {}
-            }),
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             marks_module_1.MarksModule,

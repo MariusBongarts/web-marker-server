@@ -1,3 +1,4 @@
+import { TagService } from './../tag/tag.service';
 import { ModuleRef } from '@nestjs/core';
 import { MarksService } from './../marks/marks.service';
 import { Mark } from './../marks/mark.interface';
@@ -13,7 +14,8 @@ export class BookmarksService implements OnModuleInit {
   private markService: MarksService;
   constructor(
     @InjectModel('Bookmark') private bookmarkModel: Model<Bookmark>,
-    private readonly moduleRef: ModuleRef
+    private readonly moduleRef: ModuleRef,
+    private tagService: TagService
   ) { }
 
   onModuleInit() {
@@ -38,6 +40,11 @@ export class BookmarksService implements OnModuleInit {
     if (!existingBookmark) {
       const createdBookmark = new this.bookmarkModel(bookmark);
       createdBookmark._user = user._id;
+
+      // Update tags
+      for (const tag of bookmark.tags) {
+        await this.tagService.createTagIfNotExists(user, tag);
+      }
       return await createdBookmark.save();
     } else {
       return existingBookmark;
@@ -74,6 +81,13 @@ export class BookmarksService implements OnModuleInit {
     if (oldBookmark && (!marksForBookmark || marksForBookmark.length === 0) && !bookmark.isStarred) {
       await this.deleteBookmark(user, oldBookmark._id);
     } else {
+
+      // Update tags in database
+      // Update tags
+      for (const tag of bookmark.tags) {
+        await this.tagService.createTagIfNotExists(user, tag);
+      }
+
       return await this.bookmarkModel.updateOne({ _user: user._id, id: bookmark.id }, bookmark);
     }
   }

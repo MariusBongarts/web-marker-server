@@ -1,3 +1,4 @@
+import { TagService } from './../tag/tag.service';
 import { BookmarksService } from './../bookmarks/bookmarks.service';
 import { MarkGateway } from './mark.gateway';
 import { JwtPayload } from './../auth/interfaces/jwt-payload.interface';
@@ -15,6 +16,7 @@ export class MarksService implements OnModuleInit {
   constructor(
     @InjectModel('Mark') private markModel: Model<Mark>,
     private markGateway: MarkGateway,
+    private tagService: TagService,
     private readonly moduleRef: ModuleRef
   ) { }
 
@@ -41,6 +43,7 @@ export class MarksService implements OnModuleInit {
   /**
    * Creates Mark and a bookmark if it does not exist.
    * Saves the bookmark as a foreign key in mark
+   * Creates tag if they are not existing yet
    *
    * @param {JwtPayload} user
    * @param {Mark} mark
@@ -52,6 +55,12 @@ export class MarksService implements OnModuleInit {
     createdMark._user = user._id;
     const newBookmark = this.bookmarkService.createBookMarkFromMark(mark);
     const bookmark = await this.bookmarkService.createBookmarkIfNotExists(user, newBookmark);
+
+    // Update tags
+    for (const tag of mark.tags) {
+      await this.tagService.createTagIfNotExists(user, tag);
+    }
+
     createdMark._bookmark = bookmark._id;
     return await createdMark.save();
   }
@@ -75,6 +84,11 @@ export class MarksService implements OnModuleInit {
   async updateMark(user: JwtPayload, mark: Mark) {
     // Secure that tags are distinct
     mark.tags = [...new Set([...mark.tags])];
+
+    // Update tags in database
+    for (const tag of mark.tags) {
+      await this.tagService.createTagIfNotExists(user, tag);
+    }
 
     return await this.markModel.updateOne({ _user: user._id, id: mark.id }, mark);
   }
