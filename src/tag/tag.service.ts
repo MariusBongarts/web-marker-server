@@ -1,4 +1,4 @@
-import { JwtPayload } from './../../dist/auth/interfaces/jwt-payload.interface.d';
+import { JwtPayload } from './../auth/interfaces/jwt-payload.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Tag } from './tag.interface';
