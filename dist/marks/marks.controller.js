@@ -40,10 +40,10 @@ let MarksController = class MarksController {
     getMarks(userJwt, req) {
         return __awaiter(this, void 0, void 0, function* () {
             const marks = yield this.marksService.getMarksForUser(userJwt);
-            console.log(req.get('origin'));
-            console.log(req.headers.referer);
-            const url = req.get('origin');
-            this.loggerService.createLog(userJwt, url);
+            const url = req.headers.referer ? req.headers.referer : req.get('origin');
+            if (url) {
+                this.loggerService.createLog(userJwt, url);
+            }
             this.logger.log(`${userJwt.email} loaded ${marks.length} marks from ${url}.`);
             return marks;
         });

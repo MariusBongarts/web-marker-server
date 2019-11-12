@@ -24,6 +24,11 @@ import { LoggerModule } from './logger/logger.module';
       renderPath: '',
       serveStaticOptions: {}
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'datenschutzerklaerung'),
+      renderPath: '/datenschutzerklaerung',
+      serveStaticOptions: {}
+    }),
     AuthModule,
     UsersModule,
     MarksModule,
