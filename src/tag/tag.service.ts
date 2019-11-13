@@ -40,19 +40,24 @@ export class TagService {
    * @memberof TagService
    */
   async removeTagsIfNoMarkOrBookmark(user: JwtPayload, tags: Tag[]) {
-    const marks = await this.markService.getMarksForUser(user);
-    const bookmarks = await this.bookmarkService.getBookmarksForUser(user);
+    try {
+      const marks = await this.markService.getMarksForUser(user);
+      const bookmarks = await this.bookmarkService.getBookmarksForUser(user);
 
-    // Check if tag exists in any mark or bookmark. If not, it will be deleted
-    for (const tag of tags) {
-      if (
-        !marks.some(mark => mark.tags.map(tag => tag.toLowerCase()).includes(tag.name.toLowerCase())) &&
-        !bookmarks.some(bookmark => bookmark.tags.map(tag => tag.toLowerCase()).includes(tag.name.toLowerCase()))
-      ) {
-        const tagEntry = await this.findTagByName(user, tag.name);
-        this.logger.warn(`Deleted tag ${tagEntry.name}`);
-        await tagEntry.remove();
+      // Check if tag exists in any mark or bookmark. If not, it will be deleted
+      for (const tag of tags) {
+        if (
+          !marks.some(mark => mark.tags.map(tag => tag.toLowerCase()).includes(tag.name.toLowerCase())) &&
+          !bookmarks.some(bookmark => bookmark.tags.map(tag => tag.toLowerCase()).includes(tag.name.toLowerCase()))
+        ) {
+          const tagEntry = await this.findTagByName(user, tag.name);
+          this.logger.warn(`Deleted tag ${tagEntry.name}`);
+          await tagEntry.remove();
+        }
       }
+
+    } catch (error) {
+      //
     }
 
   }
