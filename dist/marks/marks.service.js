@@ -21,6 +21,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const tag_service_1 = require("./../tag/tag.service");
 const bookmarks_service_1 = require("./../bookmarks/bookmarks.service");
 const mark_gateway_1 = require("./mark.gateway");
 const mongoose_1 = require("@nestjs/mongoose");
@@ -28,9 +29,10 @@ const common_1 = require("@nestjs/common");
 const mongoose_2 = require("mongoose");
 const core_1 = require("@nestjs/core");
 let MarksService = class MarksService {
-    constructor(markModel, markGateway, moduleRef) {
+    constructor(markModel, markGateway, tagService, moduleRef) {
         this.markModel = markModel;
         this.markGateway = markGateway;
+        this.tagService = tagService;
         this.moduleRef = moduleRef;
     }
     onModuleInit() {
@@ -62,6 +64,9 @@ let MarksService = class MarksService {
             createdMark._user = user._id;
             const newBookmark = this.bookmarkService.createBookMarkFromMark(mark);
             const bookmark = yield this.bookmarkService.createBookmarkIfNotExists(user, newBookmark);
+            for (const tag of mark.tags) {
+                yield this.tagService.createTagIfNotExists(user, tag);
+            }
             createdMark._bookmark = bookmark._id;
             return yield createdMark.save();
         });
@@ -77,6 +82,9 @@ let MarksService = class MarksService {
     updateMark(user, mark) {
         return __awaiter(this, void 0, void 0, function* () {
             mark.tags = [...new Set([...mark.tags])];
+            for (const tag of mark.tags) {
+                yield this.tagService.createTagIfNotExists(user, tag);
+            }
             return yield this.markModel.updateOne({ _user: user._id, id: mark.id }, mark);
         });
     }
@@ -97,6 +105,7 @@ MarksService = __decorate([
     __param(0, mongoose_1.InjectModel('Mark')),
     __metadata("design:paramtypes", [mongoose_2.Model,
         mark_gateway_1.MarkGateway,
+        tag_service_1.TagService,
         core_1.ModuleRef])
 ], MarksService);
 exports.MarksService = MarksService;

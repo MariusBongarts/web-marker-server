@@ -29,6 +29,7 @@ const marks_module_1 = require("./marks/marks.module");
 const bookmarks_module_1 = require("./bookmarks/bookmarks.module");
 const directory_module_1 = require("./directory/directory.module");
 const logger_module_1 = require("./logger/logger.module");
+const tag_module_1 = require("./tag/tag.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -57,7 +58,8 @@ AppModule = __decorate([
                 inject: [config_service_1.ConfigService],
             }),
             directory_module_1.DirectoryModule,
-            logger_module_1.LoggerModule
+            logger_module_1.LoggerModule,
+            tag_module_1.TagModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

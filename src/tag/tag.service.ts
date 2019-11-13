@@ -1,3 +1,6 @@
+import { ModuleRef } from '@nestjs/core';
+import { BookmarksService } from './../bookmarks/bookmarks.service';
+import { MarksService } from './../marks/marks.service';
 import { JwtPayload } from './../auth/interfaces/jwt-payload.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -7,13 +10,51 @@ import { Injectable, Logger } from '@nestjs/common';
 @Injectable()
 export class TagService {
   private logger = new Logger('TagsService');
+  private markService: MarksService;
+  private bookmarkService: BookmarksService;
 
   constructor(
     @InjectModel('Tag') private tagModel: Model<Tag>,
+    private readonly moduleRef: ModuleRef
   ) { }
 
+  onModuleInit() {
+    this.bookmarkService = this.moduleRef.get(BookmarksService, { strict: false });
+    this.markService = this.moduleRef.get(MarksService, { strict: false });
+  }
+
   async geTagsForUser(user: JwtPayload) {
-    return await this.tagModel.find({ _user: user._id }).exec();
+    const tags = await this.tagModel.find({ _user: user._id }).exec();
+
+    // This task can be done asynchronously so that we don´t have to wait for it
+    this.removeTagsIfNoMarkOrBookmark(user, tags);
+
+    return tags;
+  }
+
+  /**
+   * Checks if tag has no marks or bookmarks anymore. If that´s the case, it will be deleted
+   *
+   * @param {JwtPayload} user
+   * @param {Tag[]} tags
+   * @memberof TagService
+   */
+  async removeTagsIfNoMarkOrBookmark(user: JwtPayload, tags: Tag[]) {
+    const marks = await this.markService.getMarksForUser(user);
+    const bookmarks = await this.bookmarkService.getBookmarksForUser(user);
+
+    // Check if tag exists in any mark or bookmark. If not, it will be deleted
+    for (const tag of tags) {
+      if (
+        !marks.some(mark => mark.tags.map(tag => tag.toLowerCase()).includes(tag.name.toLowerCase())) &&
+        !bookmarks.some(bookmark => bookmark.tags.map(tag => tag.toLowerCase()).includes(tag.name.toLowerCase()))
+      ) {
+        const tagEntry = await this.findTagByName(user, tag.name);
+        this.logger.warn(`Deleted tag ${tagEntry.name}`);
+        await tagEntry.remove();
+      }
+    }
+
   }
 
   /**

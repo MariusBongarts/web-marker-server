@@ -1,4 +1,5 @@
 /// <reference types="mongodb" />
+import { TagService } from './../tag/tag.service';
 import { MarkGateway } from './mark.gateway';
 import { JwtPayload } from './../auth/interfaces/jwt-payload.interface';
 import { Mark } from './mark.interface';
@@ -8,9 +9,10 @@ import { ModuleRef } from '@nestjs/core';
 export declare class MarksService implements OnModuleInit {
     private markModel;
     private markGateway;
+    private tagService;
     private readonly moduleRef;
     private bookmarkService;
-    constructor(markModel: Model<Mark>, markGateway: MarkGateway, moduleRef: ModuleRef);
+    constructor(markModel: Model<Mark>, markGateway: MarkGateway, tagService: TagService, moduleRef: ModuleRef);
     onModuleInit(): void;
     getMarksForUser(user: JwtPayload): Promise<Mark[]>;
     getMarksForUrl(user: JwtPayload, url: string): Promise<Mark[]>;

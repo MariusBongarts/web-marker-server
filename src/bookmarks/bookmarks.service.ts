@@ -12,14 +12,16 @@ import { v4 as uuid } from 'uuid';
 @Injectable()
 export class BookmarksService implements OnModuleInit {
   private markService: MarksService;
+  private tagService: TagService;
+
   constructor(
     @InjectModel('Bookmark') private bookmarkModel: Model<Bookmark>,
     private readonly moduleRef: ModuleRef,
-    private tagService: TagService
   ) { }
 
   onModuleInit() {
     this.markService = this.moduleRef.get(MarksService, { strict: false });
+    this.tagService = this.moduleRef.get(TagService, { strict: false });
   }
 
   async getBookmarksForUser(user: JwtPayload) {

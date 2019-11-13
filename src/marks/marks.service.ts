@@ -12,16 +12,17 @@ import { ModuleRef } from '@nestjs/core';
 @Injectable()
 export class MarksService implements OnModuleInit {
   private bookmarkService: BookmarksService;
+  private tagService: TagService;
 
   constructor(
     @InjectModel('Mark') private markModel: Model<Mark>,
     private markGateway: MarkGateway,
-    private tagService: TagService,
     private readonly moduleRef: ModuleRef
   ) { }
 
   onModuleInit() {
     this.bookmarkService = this.moduleRef.get(BookmarksService, { strict: false });
+    this.tagService = this.moduleRef.get(TagService, { strict: false });
   }
 
   async getMarksForUser(user: JwtPayload) {

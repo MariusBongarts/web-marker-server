@@ -14,8 +14,8 @@ import { BookmarksService } from './bookmarks.service';
     MongooseModule.forFeature([{ name: 'Bookmark', schema: BookmarkSchema }]),
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
     UsersModule,
-    TagModule,
-    forwardRef(() => MarksModule)
+    forwardRef(() => MarksModule),
+    forwardRef(() => TagModule)
   ],
   exports: [BookmarksService],
   providers: [BookmarksService],

@@ -39,10 +39,7 @@ import { TagModule } from './tag/tag.module';
         useNewUrlParser: true
       }),
       inject: [ConfigService],
-    }),
-    DirectoryModule,
-    LoggerModule,
-    TagModule
+    })
   ],
   controllers: [AppController],
   providers: [AppService],

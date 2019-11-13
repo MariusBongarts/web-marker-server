@@ -17,7 +17,7 @@ import { MarksService } from './marks.service';
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
     UsersModule,
     LoggerModule,
-    TagModule,
+    forwardRef(() => TagModule),
     forwardRef(() => BookmarksModule)
   ],
   exports: [MarksService],
