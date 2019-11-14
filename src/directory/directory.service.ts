@@ -1,3 +1,5 @@
+import { TagService } from './../tag/tag.service';
+import { ModuleRef } from '@nestjs/core';
 import { Directory } from './directory.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, Logger } from '@nestjs/common';
@@ -7,10 +9,16 @@ import { JwtPayload } from './../auth/interfaces/jwt-payload.interface';
 @Injectable()
 export class DirectoryService {
   private logger = new Logger('DirectoryService');
+  private tagsService: TagService;
 
   constructor(
-    @InjectModel('Directory') private directoryModel: Model<Directory>
+    @InjectModel('Directory') private directoryModel: Model<Directory>,
+    private readonly moduleRef: ModuleRef
   ) { }
+
+  onModuleInit() {
+    this.tagsService = this.moduleRef.get(TagService, { strict: false });
+  }
 
   async getDirectoriesForUser(user: JwtPayload) {
     let directories = await this.directoryModel.find({ _user: user._id }).exec();
@@ -29,8 +37,24 @@ export class DirectoryService {
     return await createdDirectory.save();
   }
 
+  /**
+   * Deletes directory and all subDirectories
+   *
+   * @param {JwtPayload} user
+   * @param {string} directoryId
+   * @returns
+   * @memberof DirectoryService
+   */
   async deleteDirectory(user: JwtPayload, directoryId: string) {
-    return await this.directoryModel.deleteOne({ _user: user._id, id: directoryId });
+    const subDirectories = await this.directoryModel.find({ _user: user._id, _parentDirectory: directoryId }).exec();
+    for (const directory of subDirectories) {
+      await this.directoryModel.deleteOne({ _user: user._id, _id: directory._id });
+    }
+
+    // Update related tags. We don´t need to wait for this to finish.
+    this.tagsService.removeDirectoryIfNotExists(user);
+
+    return await this.directoryModel.deleteOne({ _user: user._id, _id: directoryId });
   }
 
   async updateDirectory(user: JwtPayload, directory: Directory) {

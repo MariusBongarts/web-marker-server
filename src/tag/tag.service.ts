@@ -30,8 +30,8 @@ export class TagService {
     const tags = await this.tagModel.find({ _user: user._id }).exec();
 
     // This task can be done asynchronously so that we don´t have to wait for it
-    this.removeTagsIfNoMarkOrBookmark(user, tags);
-    this.removeDirectoryIfNotExists(user, tags);
+    this.removeTagsIfNoMarkOrBookmark(user);
+    this.removeDirectoryIfNotExists(user);
 
     return tags;
   }
@@ -43,7 +43,8 @@ export class TagService {
    * @param {Tag[]} tags
    * @memberof TagService
    */
-  async removeDirectoryIfNotExists(user: JwtPayload, tags: Tag[]) {
+  async removeDirectoryIfNotExists(user: JwtPayload) {
+    const tags = await this.tagModel.find({ _user: user._id }).exec();
     try {
       // Check if directory and parentDirectory is still existing of tag, if not they will be deleted
       for (const tag of tags) {
@@ -70,7 +71,8 @@ export class TagService {
    * @param {Tag[]} tags
    * @memberof TagService
    */
-  async removeTagsIfNoMarkOrBookmark(user: JwtPayload, tags: Tag[]) {
+  async removeTagsIfNoMarkOrBookmark(user: JwtPayload) {
+    const tags = await this.tagModel.find({ _user: user._id }).exec();
     try {
       const marks = await this.markService.getMarksForUser(user);
       const bookmarks = await this.bookmarkService.getBookmarksForUser(user);

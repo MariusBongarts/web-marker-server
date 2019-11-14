@@ -24,10 +24,9 @@ export class UsersController {
     @UseGuards(AuthGuard())
     async testAuthRoute(@UserJwt() userJwt) {
         const user: User = await this.usersService.findOneByEmail(userJwt.email);
-        console.log(user);
         return {
             message: `Hello ${user.email}`
-        }
+        };
     }
 
 }
