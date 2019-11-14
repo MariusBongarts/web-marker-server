@@ -26,7 +26,7 @@ MarksModule = __decorate([
             passport_1.PassportModule.register({ defaultStrategy: 'jwt', session: false }),
             users_module_1.UsersModule,
             logger_module_1.LoggerModule,
-            tag_module_1.TagModule,
+            common_1.forwardRef(() => tag_module_1.TagModule),
             common_1.forwardRef(() => bookmarks_module_1.BookmarksModule)
         ],
         exports: [marks_service_1.MarksService],

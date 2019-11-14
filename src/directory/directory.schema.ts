@@ -7,8 +7,8 @@ export const DirectorySchema = new mongoose.Schema({
         required: true
     },
     _user: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-    _directory: { type: mongoose.Schema.Types.ObjectId, ref: 'Directory'},
-    _parentDirectory: { type: mongoose.Schema.Types.ObjectId, ref: 'Directory'},
+    _directory: String,
+    _parentDirectory: String,
     createdAt: Number,
     name: String
 });

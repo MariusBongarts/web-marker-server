@@ -29,14 +29,14 @@ const common_1 = require("@nestjs/common");
 const mongoose_2 = require("mongoose");
 const core_1 = require("@nestjs/core");
 let MarksService = class MarksService {
-    constructor(markModel, markGateway, tagService, moduleRef) {
+    constructor(markModel, markGateway, moduleRef) {
         this.markModel = markModel;
         this.markGateway = markGateway;
-        this.tagService = tagService;
         this.moduleRef = moduleRef;
     }
     onModuleInit() {
         this.bookmarkService = this.moduleRef.get(bookmarks_service_1.BookmarksService, { strict: false });
+        this.tagService = this.moduleRef.get(tag_service_1.TagService, { strict: false });
     }
     getMarksForUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -105,7 +105,6 @@ MarksService = __decorate([
     __param(0, mongoose_1.InjectModel('Mark')),
     __metadata("design:paramtypes", [mongoose_2.Model,
         mark_gateway_1.MarkGateway,
-        tag_service_1.TagService,
         core_1.ModuleRef])
 ], MarksService);
 exports.MarksService = MarksService;
