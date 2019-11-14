@@ -1,3 +1,4 @@
+import { DirectoryModule } from './../directory/directory.module';
 import { MarksModule } from './../marks/marks.module';
 import { BookmarksModule } from './../bookmarks/bookmarks.module';
 import { TagSchema } from './tag.schema';
@@ -12,7 +13,8 @@ import { TagService } from './tag.service';
     MongooseModule.forFeature([{ name: 'Tag', schema: TagSchema }]),
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
     forwardRef(() => BookmarksModule),
-    forwardRef(() => MarksModule)
+    forwardRef(() => MarksModule),
+    forwardRef(() => DirectoryModule)
   ],
   exports: [TagService],
   providers: [TagService],

@@ -1,3 +1,4 @@
+import { DirectoryService } from './../directory/directory.service';
 import { ModuleRef } from '@nestjs/core';
 import { BookmarksService } from './../bookmarks/bookmarks.service';
 import { MarksService } from './../marks/marks.service';
@@ -12,6 +13,7 @@ export class TagService {
   private logger = new Logger('TagsService');
   private markService: MarksService;
   private bookmarkService: BookmarksService;
+  private directoryService: DirectoryService;
 
   constructor(
     @InjectModel('Tag') private tagModel: Model<Tag>,
@@ -21,6 +23,7 @@ export class TagService {
   onModuleInit() {
     this.bookmarkService = this.moduleRef.get(BookmarksService, { strict: false });
     this.markService = this.moduleRef.get(MarksService, { strict: false });
+    this.directoryService = this.moduleRef.get(DirectoryService, { strict: false });
   }
 
   async geTagsForUser(user: JwtPayload) {
@@ -28,8 +31,36 @@ export class TagService {
 
     // This task can be done asynchronously so that we don´t have to wait for it
     this.removeTagsIfNoMarkOrBookmark(user, tags);
+    this.removeDirectoryIfNotExists(user, tags);
 
     return tags;
+  }
+
+  /**
+   * Checks if tag has directory which is not existing anymore
+   *
+   * @param {JwtPayload} user
+   * @param {Tag[]} tags
+   * @memberof TagService
+   */
+  async removeDirectoryIfNotExists(user: JwtPayload, tags: Tag[]) {
+    try {
+      // Check if directory and parentDirectory is still existing of tag, if not they will be deleted
+      for (const tag of tags) {
+        if (tag._directory) {
+        const directoryExists = await this.directoryService.getDirectoryById(user, tag._directory);
+        if (!directoryExists) {
+          const tagEntry = await this.findTagByName(user, tag.name);
+          this.logger.warn(`Deleted directory ${tagEntry._directory} for tag ${tagEntry.name} because it´s not existing anymore.`);
+          tagEntry._directory = '';
+          await this.updateTag(user, tagEntry);
+        }
+      }
+      }
+
+    } catch (error) {
+      //
+    }
   }
 
   /**
