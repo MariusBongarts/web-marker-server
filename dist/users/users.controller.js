@@ -38,7 +38,6 @@ let UsersController = class UsersController {
     testAuthRoute(userJwt) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield this.usersService.findOneByEmail(userJwt.email);
-            console.log(user);
             return {
                 message: `Hello ${user.email}`
             };

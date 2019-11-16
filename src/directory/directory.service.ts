@@ -78,9 +78,11 @@ export class DirectoryService {
       // Check if directory´s parent directory is still existing, if not it will be deleted
       for (const directory of directories) {
         if (directory._parentDirectory) {
+
           const directoryExists = await this.getDirectoryById(user, directory._parentDirectory);
-          // Delete if it is not existing or if parentDirectoryId equals directoryId
-          if (((!directoryExists) || (directory._parentDirectory === directory._id))) {
+
+          // tslint:disable-next-line: triple-equals
+          if (!directoryExists || directory._id == directory._parentDirectory) {
             directory._parentDirectory = '';
             await this.updateDirectory(user, directory);
             this.logger.warn(`Deleted parent directory for ${directory.name} because it did not exist anymore.`);
