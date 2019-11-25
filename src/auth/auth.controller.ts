@@ -12,7 +12,9 @@ export class AuthController {
     @Post()
     async login(@Body() loginUserDto: LoginUserDto, @Req() req) {
         this.logger.log(`Login attempt of ${loginUserDto.email} from ${req.get('origin')}.`);
-        return await this.authService.validateUserByPassword(loginUserDto);
+        const jwt = await this.authService.validateUserByPassword(loginUserDto, false);
+        console.log(jwt);
+        return jwt;
     }
 
 }

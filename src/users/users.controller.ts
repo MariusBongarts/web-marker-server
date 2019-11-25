@@ -1,3 +1,4 @@
+import { AuthService } from './../auth/auth.service';
 import { User } from './user.interface';
 import { UserJwt } from './decorators/email.decorator';
 import { Controller, Get, Post, Body, UseGuards, Req } from '@nestjs/common';

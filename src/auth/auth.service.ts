@@ -11,7 +11,7 @@ export class AuthService {
 
     }
 
-    async validateUserByPassword(loginAttempt: LoginUserDto) {
+    async validateUserByPassword(loginAttempt: LoginUserDto, isFirstLogin: boolean) {
 
         // This will be used for the initial login
         const userToAttempt = await this.usersService.findOneByEmail(loginAttempt.email);
@@ -22,19 +22,27 @@ export class AuthService {
             // @ts-ignore
             userToAttempt.checkPassword(loginAttempt.password, (err, isMatch) => {
 
-                if (err) {
-                    this.logger.log(`Login of user ${loginAttempt.email} failed!`);
-                    throw new UnauthorizedException(); }
+                try {
+                    if (err) {
+                        this.logger.log(`Login of user ${loginAttempt.email} failed!`);
+                        throw new UnauthorizedException();
+                    }
 
-                if (isMatch) {
-                    // If there is a successful match, generate a JWT for the user
-                    this.logger.log(`${loginAttempt.email} logged in successfully!`);
-                    resolve(this.createJwtPayload(userToAttempt));
+                    // Also checks if user is activated if it is not the first login attempt
+                    if (isMatch && (userToAttempt.activated || isFirstLogin)) {
+                        // If there is a successful match, generate a JWT for the user
+                        this.logger.log(`${loginAttempt.email} logged in successfully!`);
+                        resolve(this.createJwtPayload(userToAttempt));
 
-                } else {
-                    this.logger.log(`Login of user ${loginAttempt.email} failed!`);
+                    } else {
+                        this.logger.log(`Login of user ${loginAttempt.email} failed!`);
+                        resolve(new UnauthorizedException());
+                    }
+                } catch (error) {
                     resolve(new UnauthorizedException());
+
                 }
+
 
             });
 

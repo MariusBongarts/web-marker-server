@@ -10,11 +10,15 @@ export const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    activated: {
+        type: Boolean,
+        required: true
     }
 });
 
 // NOTE: Arrow functions are not used here as we do not want to use lexical scope for 'this'
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function (next) {
 
     const user = this;
 
