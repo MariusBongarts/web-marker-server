@@ -7,7 +7,7 @@ export declare class AuthService {
     private jwtService;
     private logger;
     constructor(usersService: UsersService, jwtService: JwtService);
-    validateUserByPassword(loginAttempt: LoginUserDto): Promise<unknown>;
+    validateUserByPassword(loginAttempt: LoginUserDto, isFirstLogin: boolean): Promise<unknown>;
     validateUserByJwt(payload: JwtPayload): Promise<{
         expiresIn: number;
         token: string;

@@ -29,6 +29,7 @@ const marks_module_1 = require("./marks/marks.module");
 const bookmarks_module_1 = require("./bookmarks/bookmarks.module");
 const directory_module_1 = require("./directory/directory.module");
 const logger_module_1 = require("./logger/logger.module");
+const activation_module_1 = require("./activation/activation.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -44,6 +45,7 @@ AppModule = __decorate([
             marks_module_1.MarksModule,
             bookmarks_module_1.BookmarksModule,
             directory_module_1.DirectoryModule,
+            activation_module_1.ActivationModule,
             config_module_1.ConfigModule,
             logger_module_1.LoggerModule,
             mongoose_1.MongooseModule.forRootAsync({
@@ -55,7 +57,8 @@ AppModule = __decorate([
                     });
                 }),
                 inject: [config_service_1.ConfigService],
-            })
+            }),
+            activation_module_1.ActivationModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

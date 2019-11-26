@@ -15,7 +15,7 @@ export class MailService {
   constructor(private configService: ConfigService,
     private readonly nodemailer: Nodemailer<NodemailerDrivers.SMTP>,
     private readonly moduleRef: ModuleRef) { }
- 
+
   onModuleInit() {
     this.activationService = this.moduleRef.get(ActivationService, { strict: false });
   }
@@ -35,7 +35,6 @@ export class MailService {
       text: text ? text : '',
       html: html ? html : ''
     }).catch(error => console.log(error));
-    console.log(email);
     return email;
   }
 

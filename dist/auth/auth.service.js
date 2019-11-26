@@ -27,21 +27,26 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
         this.logger = new common_1.Logger('AuthService');
     }
-    validateUserByPassword(loginAttempt) {
+    validateUserByPassword(loginAttempt, isFirstLogin) {
         return __awaiter(this, void 0, void 0, function* () {
             const userToAttempt = yield this.usersService.findOneByEmail(loginAttempt.email);
             return new Promise((resolve) => {
                 userToAttempt.checkPassword(loginAttempt.password, (err, isMatch) => {
-                    if (err) {
-                        this.logger.log(`Login of user ${loginAttempt.email} failed!`);
-                        throw new common_1.UnauthorizedException();
+                    try {
+                        if (err) {
+                            this.logger.log(`Login of user ${loginAttempt.email} failed!`);
+                            throw new common_1.UnauthorizedException();
+                        }
+                        if (isMatch && (userToAttempt.activated || isFirstLogin)) {
+                            this.logger.log(`${loginAttempt.email} logged in successfully!`);
+                            resolve(this.createJwtPayload(userToAttempt));
+                        }
+                        else {
+                            this.logger.log(`Login of user ${loginAttempt.email} failed!`);
+                            resolve(new common_1.UnauthorizedException());
+                        }
                     }
-                    if (isMatch) {
-                        this.logger.log(`${loginAttempt.email} logged in successfully!`);
-                        resolve(this.createJwtPayload(userToAttempt));
-                    }
-                    else {
-                        this.logger.log(`Login of user ${loginAttempt.email} failed!`);
+                    catch (error) {
                         resolve(new common_1.UnauthorizedException());
                     }
                 });

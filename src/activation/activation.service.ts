@@ -59,6 +59,7 @@ export class ActivationService {
         const activated = await this.userService.activateUser(existingActivation.email);
         if (activated) {
           await existingActivation.remove();
+          this.logger.log(`Email confirmation of ${existingActivation.email}!`);
           return true;
         } else {
           return false;

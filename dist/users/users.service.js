@@ -21,33 +21,63 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const mail_service_1 = require("./../mail/mail.service");
+const core_1 = require("@nestjs/core");
+const auth_service_1 = require("./../auth/auth.service");
 const config_service_1 = require("./../config/config.service");
 const mongoose_1 = require("mongoose");
 const common_1 = require("@nestjs/common");
 const mongoose_2 = require("@nestjs/mongoose");
 let UsersService = class UsersService {
-    constructor(userModel, configService) {
+    constructor(userModel, configService, moduleRef, mailService) {
         this.userModel = userModel;
         this.configService = configService;
+        this.moduleRef = moduleRef;
+        this.mailService = mailService;
         this.logger = new common_1.Logger('UsersService');
+    }
+    onModuleInit() {
+        this.authService = this.moduleRef.get(auth_service_1.AuthService, { strict: false });
     }
     create(createUserDto) {
         return __awaiter(this, void 0, void 0, function* () {
+            createUserDto.activated = false;
             const createdUser = new this.userModel(createUserDto);
             this.logger.log(`Registration of new user ${createUserDto.email}!`);
-            return yield createdUser.save();
+            yield createdUser.save();
+            yield this.mailService.sendActivationLink(createUserDto);
+            return yield this.authService.validateUserByPassword(createUserDto, true);
         });
     }
     findOneByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.userModel.findOne({ email: email });
+            const user = yield this.userModel.findOne({ email: email });
+            return user;
+        });
+    }
+    activateUser(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield this.findOneByEmail(email);
+                if (user) {
+                    user.activated = true;
+                    yield user.save();
+                }
+                return true;
+            }
+            catch (error) {
+                return false;
+            }
         });
     }
 };
 UsersService = __decorate([
     common_1.Injectable(),
     __param(0, mongoose_2.InjectModel('User')),
-    __metadata("design:paramtypes", [mongoose_1.Model, config_service_1.ConfigService])
+    __metadata("design:paramtypes", [mongoose_1.Model,
+        config_service_1.ConfigService,
+        core_1.ModuleRef,
+        mail_service_1.MailService])
 ], UsersService);
 exports.UsersService = UsersService;
 //# sourceMappingURL=users.service.js.map
