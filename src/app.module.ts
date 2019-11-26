@@ -17,6 +17,7 @@ import { DirectoryModule } from './directory/directory.module';
 import { LoggerService } from './logger/logger.service';
 import { LoggerModule } from './logger/logger.module';
 import { TagModule } from './tag/tag.module';
+import { ActivationModule } from './activation/activation.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { TagModule } from './tag/tag.module';
     MarksModule,
     BookmarksModule,
     DirectoryModule,
+    ActivationModule,
     ConfigModule,
     LoggerModule,
     MongooseModule.forRootAsync({
@@ -39,7 +41,8 @@ import { TagModule } from './tag/tag.module';
         useNewUrlParser: true
       }),
       inject: [ConfigService],
-    })
+    }),
+    ActivationModule
   ],
   controllers: [AppController],
   providers: [AppService],

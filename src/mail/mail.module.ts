@@ -1,7 +1,8 @@
+import { ActivationModule } from './../activation/activation.module';
 import { ConfigService } from './../config/config.service';
 import { ConfigModule } from './../config/config.module';
 import { MailService } from './mail.service';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { NodemailerModule } from '@crowdlinker/nestjs-mailer';
 import { NodemailerDrivers } from '@crowdlinker/nestjs-mailer';
 import { NodemailerOptions } from '@crowdlinker/nestjs-mailer';
@@ -9,6 +10,7 @@ import { NodemailerOptions } from '@crowdlinker/nestjs-mailer';
 @Module({
   imports: [
     ConfigModule,
+    forwardRef(() => ActivationModule),
     NodemailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) =>
