@@ -1,3 +1,4 @@
+import { MailService } from './../mail/mail.service';
 import { ModuleRef } from '@nestjs/core';
 import { AuthService } from './../auth/auth.service';
 import { ConfigService } from './../config/config.service';
@@ -6,8 +7,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Nodemailer } from '@crowdlinker/nestjs-mailer';
-import { NodemailerDrivers } from '@crowdlinker/nestjs-mailer';
 @Injectable()
 export class UsersService {
   private logger = new Logger('UsersService');
@@ -17,7 +16,7 @@ export class UsersService {
     @InjectModel('User') private userModel: Model<User>,
     private configService: ConfigService,
     private readonly moduleRef: ModuleRef,
-    private readonly nodemailer: Nodemailer<NodemailerDrivers.SMTP>
+    private mailService: MailService
   ) { }
 
   onModuleInit() {
@@ -25,7 +24,7 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    await this.sendEmail();
+    await this.mailService.sendActivationLink(createUserDto);
     createUserDto.activated = false;
     const createdUser = new this.userModel(createUserDto);
     this.logger.log(`Registration of new user ${createUserDto.email}!`);
@@ -38,14 +37,5 @@ export class UsersService {
     return user;
   }
 
-  async sendEmail() {
-    const email = await this.nodemailer.sendMail({
-      to: 'mariusbongarts@web.de',
-      subject: 'Test',
-      text: 'Test',
-      html: '<h1>Test</h1>'
-    }).catch(error => console.log(error));
-    console.log(email);
-    return email;
-  }
+
 }
