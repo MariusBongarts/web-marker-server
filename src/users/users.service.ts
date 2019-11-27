@@ -1,3 +1,4 @@
+import { EmailAlreadyRegisteredException } from './../exceptions/EmailAlreadyRegisteredException';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { MailService } from './../mail/mail.service';
 import { ModuleRef } from '@nestjs/core';
@@ -27,15 +28,22 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     createUserDto.activated = false;
     const createdUser = new this.userModel(createUserDto);
-    this.logger.log(`Registration of new user ${createUserDto.email}!`);
-    await createdUser.save();
-    await this.mailService.sendActivationLink(createUserDto);
+    await createdUser.save().catch(error => {
+      this.logger.log(`FAIL: Registration of Email ${createUserDto.email} failed because it is already registered!`);
+      throw new EmailAlreadyRegisteredException();
+    });
+    await this.mailService.sendActivationLink(createUserDto.email);
+    this.logger.log(`SUCCESSS: Registration of new user ${createUserDto.email}!`);
     return await this.authService.validateUserByPassword(createUserDto, true);
   }
 
   async findOneByEmail(email) {
     const user = await this.userModel.findOne({ email: email });
     return user;
+  }
+
+  async sendEmailConfirmationLink(email: string) {
+    await this.mailService.sendActivationLink(email);
   }
 
 

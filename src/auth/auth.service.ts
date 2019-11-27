@@ -1,3 +1,5 @@
+import { EmailNotConfirmedException } from './../exceptions/EmailNotConfirmedException';
+import { InvalidEmailOrPasswordException } from './../exceptions/InvalidEmailOrPasswordException';
 import { CreateUserDto } from './../users/dto/create-user.dto';
 import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -17,36 +19,35 @@ export class AuthService {
         // This will be used for the initial login
         const userToAttempt = await this.usersService.findOneByEmail(loginAttempt.email);
 
-        return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
 
-            // Check the supplied password against the hash stored for this email address
-            // @ts-ignore
-            userToAttempt.checkPassword(loginAttempt.password, (err, isMatch) => {
+                // Check the supplied password against the hash stored for this email address
+                // @ts-ignore
+                userToAttempt.checkPassword(loginAttempt.password, (err, isMatch) => {
+                    try {
 
-                try {
-                    if (err) {
-                        this.logger.log(`Login of user ${loginAttempt.email} failed!`);
-                        throw new UnauthorizedException();
+                        if (err) {
+                            this.logger.log(`Login of user ${loginAttempt.email} failed!`);
+                            reject(new InvalidEmailOrPasswordException());
+                        }
+
+                        // Also checks if user is activated if it is not the first login attempt
+                        if (!(userToAttempt.activated || isFirstLogin)) throw new EmailNotConfirmedException();
+
+                        if (isMatch && (userToAttempt.activated || isFirstLogin)) {
+                            // If there is a successful match, generate a JWT for the user
+                            this.logger.log(`${loginAttempt.email} logged in successfully!`);
+                            resolve(this.createJwtPayload(userToAttempt));
+                        } else {
+                            this.logger.log(`Login of user ${loginAttempt.email} failed!`);
+                            reject(new UnauthorizedException());
+                        }
+
+                    } catch (error) {
+                        reject(error);
                     }
-
-                    // Also checks if user is activated if it is not the first login attempt
-                    if (isMatch && (userToAttempt.activated || isFirstLogin)) {
-                        // If there is a successful match, generate a JWT for the user
-                        this.logger.log(`${loginAttempt.email} logged in successfully!`);
-                        resolve(this.createJwtPayload(userToAttempt));
-
-                    } else {
-                        this.logger.log(`Login of user ${loginAttempt.email} failed!`);
-                        throw new UnauthorizedException();
-                    }
-                } catch (error) {
-                    resolve(false);
-                }
-
-
+                });
             });
-
-        });
 
     }
 

@@ -1,3 +1,4 @@
+import { TokenInvalidException } from './../exceptions/TokenInvalidException';
 import { TokenHasExpiredException } from './../exceptions/TokenHasExpiredException';
 import { ModuleRef } from '@nestjs/core';
 import { UsersService } from './../users/users.service';
@@ -31,15 +32,25 @@ export class ActivationService {
    * @returns
    * @memberof ActivationService
    */
-  async createOrUpdateActivationKeyForUser(user: CreateUserDto) {
+  async createOrUpdateActivationKeyForUser(email: string) {
+
+    // Delete existing token
+    try {
+      const token = await this.activationModel.remove({ email: email });
+      if (token.deletedCount > 0) this.logger.log(`Deleted ${token.deletedCount} existing email confirmation token for email ${email}!`);
+    } catch (error) {
+      //
+    }
+
     const token = cryptoRandomString({ length: 32, type: 'url-safe' });
     const activation: Partial<Activation> = {
-      email: user.email,
+      email: email,
       token: token,
       createdAt: new Date().getTime()
     };
     const createdActivation = new this.activationModel(activation);
     await createdActivation.save();
+    this.logger.log(`Created email activation token for email ${email}!`);
     return token;
   }
 
@@ -56,7 +67,9 @@ export class ActivationService {
     try {
       const tokenEntry = await this.activationModel.findOne({ token: token }).exec();
 
-      // Token is only valid for a hour (36000000 milliseconds)
+      if (!tokenEntry) throw new TokenInvalidException();
+
+        // Token is only valid for a hour (36000000 milliseconds)
       const currentMillis = new Date().getTime();
       const valid = (currentMillis - tokenEntry.createdAt) < this.TOKEN_VALIDITY;
       if (!valid) throw new TokenHasExpiredException();
@@ -65,15 +78,18 @@ export class ActivationService {
         const activated = await this.userService.activateUser(tokenEntry.email);
         if (activated) {
           this.logger.log(`Email confirmation of ${tokenEntry.email}!`);
+          await tokenEntry.remove();
+          this.logger.log(`Delete email-confirmation token for ${tokenEntry.email}!`);
           return true;
         } else {
-          return false;
+          throw new TokenInvalidException();
         }
       } else {
-        return false;
+        throw new TokenInvalidException();
       }
     } catch (error) {
-      return false;
+      this.logger.log(`Email Activation for token ${token} failed!`);
+      throw error;
     }
   }
 }

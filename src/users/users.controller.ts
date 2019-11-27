@@ -18,7 +18,11 @@ export class UsersController {
 
     @Post('/register')
     async create(@Body() createUserDto: CreateUserDto) {
-        return await this.usersService.create(createUserDto);
+        try {
+            return await this.usersService.create(createUserDto);
+        } catch(error) {
+            throw error;
+        }
     }
 
     @Post('/change-password')
@@ -36,6 +40,11 @@ export class UsersController {
     @Post('/reset-password')
     async resetPassword(@Query('email') email: string) {
         await this.usersService.sendForgotEmailPassword(email);
+    }
+
+    @Post('/resend-email-confirmation')
+    async resendRemailConfirmation(@Query('email') email: string) {
+        await this.usersService.sendEmailConfirmationLink(email);
     }
 
 

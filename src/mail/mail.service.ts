@@ -3,13 +3,14 @@ import { ModuleRef } from '@nestjs/core';
 import { ActivationService } from './../activation/activation.service';
 import { CreateUserDto } from './../users/dto/create-user.dto';
 import { ConfigService } from './../config/config.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Transporter } from 'nodemailer';
 import { Nodemailer } from '@crowdlinker/nestjs-mailer';
 import { NodemailerDrivers } from '@crowdlinker/nestjs-mailer';
 
 @Injectable()
 export class MailService {
+  private logger = new Logger('MailService');
   transporter: Transporter;
   private activationService: ActivationService;
 
@@ -22,12 +23,13 @@ export class MailService {
     this.activationService = this.moduleRef.get(ActivationService, { strict: false });
   }
 
-  async sendActivationLink(user: CreateUserDto) {
-    const token = await this.activationService.createOrUpdateActivationKeyForUser(user);
-    await this.sendEmail(user.email, 'Email confirmation', '', `
+  async sendActivationLink(email: string) {
+    const token = await this.activationService.createOrUpdateActivationKeyForUser(email);
+    await this.sendEmail(email, 'Email confirmation', '', `
     <h1>Welcome to Web Highlighter</h1>
     <a target="_blank" href="https://marius96.uber.space/activation?token=${token}">Activate your account</a>
-    `)
+    `);
+    this.logger.log(`Activation link sent to ${email}!`);
   }
 
   async sendForgotEmailPassword(email: string) {
@@ -38,6 +40,7 @@ export class MailService {
       <h1>Reset your password</h1>
       <a target="_blank" href="https://marius96.uber.space/reset-password?token=${token}">Follow this link to create a new password</a>
       `)
+      this.logger.log(`Forgot password link sent to ${email}!`);
     }
   }
 

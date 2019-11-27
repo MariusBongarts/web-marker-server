@@ -33,6 +33,15 @@ export class PasswordResetService {
    * @memberof PasswordResetService
    */
   async createPasswordResetToken(email: string) {
+
+    // Delete existing token
+    try {
+      const token = await this.passwordResetModel.remove({ email: email });
+      if (token.deletedCount > 0) this.logger.log(`Deleted ${token.deletedCount} existing password-reset token for email ${email}!`);
+    } catch (error) {
+      //
+    }
+
     const token = cryptoRandomString({ length: 32, type: 'url-safe' });
     const activation: Partial<PasswordReset> = {
       email: email,
@@ -45,10 +54,13 @@ export class PasswordResetService {
   }
 
 
+
   /**
    * Checks if the given token is correct, valid and not expired to reset the password
+   * Throws either a @TokenHasExpiredException or @TokenInvalidException with status 401 if token is invalid
    *
    * @param {string} token
+   * @param {string} newPassword
    * @returns
    * @memberof PasswordResetService
    */
@@ -75,7 +87,7 @@ export class PasswordResetService {
             await user.save();
             this.logger.log(`Password reset for ${tokenEntry.email} was successfull!`);
             await tokenEntry.remove();
-            this.logger.log(`TokenEntry for ${tokenEntry.email} was deleted!`);
+            this.logger.log(`Delete password-reset token for ${tokenEntry.email}!`);
             return true;
           } else {
             throw new TokenInvalidException();
@@ -87,6 +99,7 @@ export class PasswordResetService {
         throw new TokenInvalidException();
       }
     } catch (error) {
+      this.logger.log(`Password reset for token ${token} failed!`);
       throw error;
     }
 
