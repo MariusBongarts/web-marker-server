@@ -1,3 +1,4 @@
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { MailService } from './../mail/mail.service';
 import { ModuleRef } from '@nestjs/core';
 import { AuthService } from './../auth/auth.service';
@@ -37,6 +38,39 @@ export class UsersService {
     return user;
   }
 
+
+  /**
+   * Users can change their passwords.
+   * Beforehand the oldPassword will be checked and the new one overwritten.
+   * The overwriting process is done by the user schema
+   *
+   * @param {UpdatePasswordDto} createdUserDto
+   * @memberof UsersService
+   */
+  async updatePassword(updateUserDto: UpdatePasswordDto) {
+    try {
+      const result = await this.authService.validateUserByPassword({email: updateUserDto.email, password: updateUserDto.oldPassword}, false);
+
+      if (result) {
+        const user = await this.findOneByEmail(updateUserDto.email);
+        user['password'] = updateUserDto.newPassword;
+        this.logger.log(`SUCCEED: ${updateUserDto.email} successfully updated password`);
+        await user.save();
+        return true;
+      } else {
+        this.logger.log(`FAIL: ${updateUserDto.email} failed updating password`);
+        return false;
+      }
+
+    } catch(error) {
+      this.logger.log(`FAIL: ${updateUserDto.email} failed updating password`);
+    }
+  }
+
+  async sendForgotEmailPassword(email: string) {
+    await this.mailService.sendForgotEmailPassword(email);
+    this.logger.log(`Succeed: Reset password link sent to ${email}`);
+  }
 
   /**
    * Activates the email address of the user.

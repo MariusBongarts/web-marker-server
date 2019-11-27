@@ -1,3 +1,4 @@
+import { TokenHasExpiredException } from './../exceptions/TokenHasExpiredException';
 import { ModuleRef } from '@nestjs/core';
 import { UsersService } from './../users/users.service';
 import { InjectModel } from '@nestjs/mongoose';
@@ -30,23 +31,21 @@ export class ActivationService {
    * @memberof ActivationService
    */
   async createOrUpdateActivationKeyForUser(user: CreateUserDto) {
-    const token = cryptoRandomString({ length: 16, type: 'url-safe' });
+    const token = cryptoRandomString({ length: 32, type: 'url-safe' });
     const activation: Partial<Activation> = {
       email: user.email,
       token: token,
+      createdAt: new Date().getTime()
     };
-    const existingToken = await this.activationModel.findOne({ email: user.email }).exec();
-    if (!existingToken) {
-      const createdActivation = new this.activationModel(activation);
-      await createdActivation.save();
-    }
+    const createdActivation = new this.activationModel(activation);
+    await createdActivation.save();
     return token;
   }
 
 
   /**
    * Find a activation entry by the given access token. If a entry can be found
-   * the user will be activated in the UserService and the activation token will be deleted
+   * the user will be activated in the UserService. The token is valid for one hour.
    * Either true or false will be returned
    *
    * @param {string} token
@@ -54,12 +53,17 @@ export class ActivationService {
    */
   async confirmActivation(token: string) {
     try {
-      const existingActivation = await this.activationModel.findOne({ token: token }).exec();
-      if (existingActivation) {
-        const activated = await this.userService.activateUser(existingActivation.email);
+      const tokenEntry = await this.activationModel.findOne({ token: token }).exec();
+
+      // Token is only valid for a hour (36000000 milliseconds)
+      const currentMillis = new Date().getTime();
+      const valid = (currentMillis - tokenEntry.createdAt) < 36000000;
+      if (!valid) throw new TokenHasExpiredException();
+
+      if (tokenEntry && valid) {
+        const activated = await this.userService.activateUser(tokenEntry.email);
         if (activated) {
-          await existingActivation.remove();
-          this.logger.log(`Email confirmation of ${existingActivation.email}!`);
+          this.logger.log(`Email confirmation of ${tokenEntry.email}!`);
           return true;
         } else {
           return false;
@@ -70,6 +74,5 @@ export class ActivationService {
     } catch (error) {
       return false;
     }
-
   }
 }

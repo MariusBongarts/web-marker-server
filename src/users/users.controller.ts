@@ -1,7 +1,9 @@
+import { OldPasswordIsIncorrectException } from './../exceptions/OldPasswordIncorrectException';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { AuthService } from './../auth/auth.service';
 import { User } from './user.interface';
 import { UserJwt } from './decorators/email.decorator';
-import { Controller, Get, Post, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req, HttpException, HttpStatus, Query } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -19,15 +21,22 @@ export class UsersController {
         return await this.usersService.create(createUserDto);
     }
 
-    // This route will require successfully passing our default auth strategy (JWT) in order
-    // to access the route
-    @Get('test')
+    @Post('/change-password')
     @UseGuards(AuthGuard())
-    async testAuthRoute(@UserJwt() userJwt) {
-        const user: User = await this.usersService.findOneByEmail(userJwt.email);
-        return {
-            message: `Hello ${user.email}`
-        };
+    async changePassword(@Body() updatePasswordDto: UpdatePasswordDto) {
+        const result = await this.usersService.updatePassword(updatePasswordDto);
+
+        if (!result) {
+            throw new OldPasswordIsIncorrectException();
+        } else {
+            return 'Successfully changed password!';
+        }
     }
+
+    @Post('/reset-password')
+    async resetPassword(@Query('email') email: string) {
+        await this.usersService.sendForgotEmailPassword(email);
+    }
+
 
 }

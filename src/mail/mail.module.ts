@@ -1,3 +1,4 @@
+import { PasswordResetModule } from './../password-reset/password-reset.module';
 import { ActivationModule } from './../activation/activation.module';
 import { ConfigService } from './../config/config.service';
 import { ConfigModule } from './../config/config.module';
@@ -11,6 +12,7 @@ import { NodemailerOptions } from '@crowdlinker/nestjs-mailer';
   imports: [
     ConfigModule,
     forwardRef(() => ActivationModule),
+    PasswordResetModule,
     NodemailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) =>

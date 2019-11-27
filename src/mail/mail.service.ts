@@ -1,3 +1,4 @@
+import { PasswordResetService } from './../password-reset/password-reset.service';
 import { ModuleRef } from '@nestjs/core';
 import { ActivationService } from './../activation/activation.service';
 import { CreateUserDto } from './../users/dto/create-user.dto';
@@ -14,7 +15,8 @@ export class MailService {
 
   constructor(private configService: ConfigService,
     private readonly nodemailer: Nodemailer<NodemailerDrivers.SMTP>,
-    private readonly moduleRef: ModuleRef) { }
+    private readonly moduleRef: ModuleRef,
+    private passwordResetService: PasswordResetService) { }
 
   onModuleInit() {
     this.activationService = this.moduleRef.get(ActivationService, { strict: false });
@@ -26,6 +28,17 @@ export class MailService {
     <h1>Welcome to Web Highlighter</h1>
     <a target="_blank" href="https://marius96.uber.space/activation?token=${token}">Activate your account</a>
     `)
+  }
+
+  async sendForgotEmailPassword(email: string) {
+    const token = await this.passwordResetService.createPasswordResetToken(email);
+
+    if (token) {
+      await this.sendEmail(email, 'Password reset', '', `
+      <h1>Reset your password</h1>
+      <a target="_blank" href="https://marius96.uber.space/reset-password?token=${token}">Follow this link to create a new password</a>
+      `)
+    }
   }
 
   async sendEmail(to: string, subject: string, text?: string, html?: string) {

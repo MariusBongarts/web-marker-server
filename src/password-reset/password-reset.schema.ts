@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 
-export const ActivationSchema = new mongoose.Schema({
+export const PasswordResetSchema = new mongoose.Schema({
     token: {
         type: String,
         unique: true,

@@ -1,3 +1,4 @@
+import { CreateUserDto } from './../users/dto/create-user.dto';
 import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from '../users/dto/login-user.dto';
@@ -36,11 +37,10 @@ export class AuthService {
 
                     } else {
                         this.logger.log(`Login of user ${loginAttempt.email} failed!`);
-                        resolve(new UnauthorizedException());
+                        throw new UnauthorizedException();
                     }
                 } catch (error) {
-                    resolve(new UnauthorizedException());
-
+                    resolve(false);
                 }
 
 

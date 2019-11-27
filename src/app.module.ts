@@ -18,6 +18,7 @@ import { LoggerService } from './logger/logger.service';
 import { LoggerModule } from './logger/logger.module';
 import { TagModule } from './tag/tag.module';
 import { ActivationModule } from './activation/activation.module';
+import { PasswordResetModule } from './password-reset/password-reset.module';
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { ActivationModule } from './activation/activation.module';
       }),
       inject: [ConfigService],
     }),
-    ActivationModule
+    ActivationModule,
+    PasswordResetModule
   ],
   controllers: [AppController],
   providers: [AppService],
