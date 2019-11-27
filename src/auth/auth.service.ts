@@ -40,7 +40,7 @@ export class AuthService {
                             resolve(this.createJwtPayload(userToAttempt));
                         } else {
                             this.logger.log(`Login of user ${loginAttempt.email} failed!`);
-                            reject(new UnauthorizedException());
+                            reject(new InvalidEmailOrPasswordException());
                         }
 
                     } catch (error) {
