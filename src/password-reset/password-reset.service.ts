@@ -13,6 +13,9 @@ export class PasswordResetService {
   private logger = new Logger('PasswordResetService');
   private userService: UsersService;
 
+  // One hour
+  TOKEN_VALIDITY = 3600000;
+
   constructor(
     @InjectModel('PasswordReset') private passwordResetModel: Model<PasswordReset>,
     private readonly moduleRef: ModuleRef
@@ -57,8 +60,13 @@ export class PasswordResetService {
       if (tokenEntry) {
         // Token is only valid for a hour (36000000 milliseconds)
         const currentMillis = new Date().getTime();
-        const valid = (currentMillis - tokenEntry.createdAt) < 36000000;
-        if (!valid) throw new TokenHasExpiredException();
+        const valid = (currentMillis - tokenEntry.createdAt) < this.TOKEN_VALIDITY;
+        if (!valid && tokenEntry) {
+          await tokenEntry.remove();
+          this.logger.log(`TokenEntry for ${tokenEntry.email} has expired and is deleted!`);
+          throw new TokenHasExpiredException();
+          // TODO DELETE TOKEN
+        }
 
         if (tokenEntry && valid) {
           const user = await this.userService.findOneByEmail(tokenEntry.email);
@@ -66,6 +74,8 @@ export class PasswordResetService {
             user['password'] = newPassword;
             await user.save();
             this.logger.log(`Password reset for ${tokenEntry.email} was successfull!`);
+            await tokenEntry.remove();
+            this.logger.log(`TokenEntry for ${tokenEntry.email} was deleted!`);
             return true;
           } else {
             throw new TokenInvalidException();
@@ -77,7 +87,7 @@ export class PasswordResetService {
         throw new TokenInvalidException();
       }
     } catch (error) {
-      throw new TokenInvalidException();
+      throw error;
     }
 
   }

@@ -12,6 +12,7 @@ const cryptoRandomString = require('crypto-random-string');
 export class ActivationService {
   private logger = new Logger('ActivationService');
   private userService: UsersService;
+  TOKEN_VALIDITY = 3600000;
 
   constructor(
     @InjectModel('Activation') private activationModel: Model<Activation>,
@@ -57,7 +58,7 @@ export class ActivationService {
 
       // Token is only valid for a hour (36000000 milliseconds)
       const currentMillis = new Date().getTime();
-      const valid = (currentMillis - tokenEntry.createdAt) < 36000000;
+      const valid = (currentMillis - tokenEntry.createdAt) < this.TOKEN_VALIDITY;
       if (!valid) throw new TokenHasExpiredException();
 
       if (tokenEntry && valid) {
