@@ -24,6 +24,7 @@ exports.MarkSchema = new mongoose.Schema({
     endContainerText: String,
     completeText: String,
     title: String,
-    scrollY: Number
+    scrollY: Number,
+    rangyObject: String
 });
 //# sourceMappingURL=mark.schema.js.map

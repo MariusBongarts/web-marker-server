@@ -32,8 +32,9 @@ let AuthController = class AuthController {
     login(loginUserDto, req) {
         return __awaiter(this, void 0, void 0, function* () {
             this.logger.log(`Login attempt of ${loginUserDto.email} from ${req.get('origin')}.`);
-            const jwt = yield this.authService.validateUserByPassword(loginUserDto, false);
-            console.log(jwt);
+            const jwt = yield this.authService.validateUserByPassword(loginUserDto, false).catch(error => {
+                throw error;
+            });
             return jwt;
         });
     }

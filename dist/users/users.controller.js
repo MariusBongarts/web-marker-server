@@ -21,7 +21,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const email_decorator_1 = require("./decorators/email.decorator");
+const OldPasswordIncorrectException_1 = require("./../exceptions/OldPasswordIncorrectException");
+const update_password_dto_1 = require("./dto/update-password.dto");
 const common_1 = require("@nestjs/common");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const users_service_1 = require("./users.service");
@@ -32,15 +33,33 @@ let UsersController = class UsersController {
     }
     create(createUserDto) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.usersService.create(createUserDto);
+            try {
+                return yield this.usersService.create(createUserDto);
+            }
+            catch (error) {
+                throw error;
+            }
         });
     }
-    testAuthRoute(userJwt) {
+    changePassword(updatePasswordDto) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield this.usersService.findOneByEmail(userJwt.email);
-            return {
-                message: `Hello ${user.email}`
-            };
+            const result = yield this.usersService.updatePassword(updatePasswordDto);
+            if (!result) {
+                throw new OldPasswordIncorrectException_1.OldPasswordIsIncorrectException();
+            }
+            else {
+                return 'Successfully changed password!';
+            }
+        });
+    }
+    resetPassword(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.usersService.sendForgotEmailPassword(email);
+        });
+    }
+    resendRemailConfirmation(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.usersService.sendEmailConfirmationLink(email);
         });
     }
 };
@@ -52,13 +71,27 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "create", null);
 __decorate([
-    common_1.Get('test'),
+    common_1.Post('/change-password'),
     common_1.UseGuards(passport_1.AuthGuard()),
-    __param(0, email_decorator_1.UserJwt()),
+    __param(0, common_1.Body()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [update_password_dto_1.UpdatePasswordDto]),
     __metadata("design:returntype", Promise)
-], UsersController.prototype, "testAuthRoute", null);
+], UsersController.prototype, "changePassword", null);
+__decorate([
+    common_1.Post('/reset-password'),
+    __param(0, common_1.Query('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "resetPassword", null);
+__decorate([
+    common_1.Post('/resend-email-confirmation'),
+    __param(0, common_1.Query('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "resendRemailConfirmation", null);
 UsersController = __decorate([
     common_1.Controller('users'),
     __metadata("design:paramtypes", [users_service_1.UsersService])

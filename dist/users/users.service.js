@@ -21,6 +21,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const EmailAlreadyRegisteredException_1 = require("./../exceptions/EmailAlreadyRegisteredException");
 const mail_service_1 = require("./../mail/mail.service");
 const core_1 = require("@nestjs/core");
 const auth_service_1 = require("./../auth/auth.service");
@@ -43,9 +44,12 @@ let UsersService = class UsersService {
         return __awaiter(this, void 0, void 0, function* () {
             createUserDto.activated = false;
             const createdUser = new this.userModel(createUserDto);
-            this.logger.log(`Registration of new user ${createUserDto.email}!`);
-            yield createdUser.save();
-            yield this.mailService.sendActivationLink(createUserDto);
+            yield createdUser.save().catch(error => {
+                this.logger.log(`FAIL: Registration of Email ${createUserDto.email} failed because it is already registered!`);
+                throw new EmailAlreadyRegisteredException_1.EmailAlreadyRegisteredException();
+            });
+            yield this.mailService.sendActivationLink(createUserDto.email);
+            this.logger.log(`SUCCESSS: Registration of new user ${createUserDto.email}!`);
             return yield this.authService.validateUserByPassword(createUserDto, true);
         });
     }
@@ -53,6 +57,38 @@ let UsersService = class UsersService {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield this.userModel.findOne({ email: email });
             return user;
+        });
+    }
+    sendEmailConfirmationLink(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.mailService.sendActivationLink(email);
+        });
+    }
+    updatePassword(updateUserDto) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield this.authService.validateUserByPassword({ email: updateUserDto.email, password: updateUserDto.oldPassword }, false);
+                if (result) {
+                    const user = yield this.findOneByEmail(updateUserDto.email);
+                    user['password'] = updateUserDto.newPassword;
+                    this.logger.log(`SUCCEED: ${updateUserDto.email} successfully updated password`);
+                    yield user.save();
+                    return true;
+                }
+                else {
+                    this.logger.log(`FAIL: ${updateUserDto.email} failed updating password`);
+                    return false;
+                }
+            }
+            catch (error) {
+                this.logger.log(`FAIL: ${updateUserDto.email} failed updating password`);
+            }
+        });
+    }
+    sendForgotEmailPassword(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.mailService.sendForgotEmailPassword(email);
+            this.logger.log(`Succeed: Reset password link sent to ${email}`);
         });
     }
     activateUser(email) {

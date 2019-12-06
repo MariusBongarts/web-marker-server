@@ -30,6 +30,7 @@ const bookmarks_module_1 = require("./bookmarks/bookmarks.module");
 const directory_module_1 = require("./directory/directory.module");
 const logger_module_1 = require("./logger/logger.module");
 const activation_module_1 = require("./activation/activation.module");
+const password_reset_module_1 = require("./password-reset/password-reset.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -58,7 +59,8 @@ AppModule = __decorate([
                 }),
                 inject: [config_service_1.ConfigService],
             }),
-            activation_module_1.ActivationModule
+            activation_module_1.ActivationModule,
+            password_reset_module_1.PasswordResetModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

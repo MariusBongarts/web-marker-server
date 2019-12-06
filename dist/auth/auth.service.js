@@ -18,6 +18,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const EmailNotConfirmedException_1 = require("./../exceptions/EmailNotConfirmedException");
+const InvalidEmailOrPasswordException_1 = require("./../exceptions/InvalidEmailOrPasswordException");
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const users_service_1 = require("../users/users.service");
@@ -30,24 +32,26 @@ let AuthService = class AuthService {
     validateUserByPassword(loginAttempt, isFirstLogin) {
         return __awaiter(this, void 0, void 0, function* () {
             const userToAttempt = yield this.usersService.findOneByEmail(loginAttempt.email);
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 userToAttempt.checkPassword(loginAttempt.password, (err, isMatch) => {
                     try {
                         if (err) {
                             this.logger.log(`Login of user ${loginAttempt.email} failed!`);
-                            throw new common_1.UnauthorizedException();
+                            reject(new InvalidEmailOrPasswordException_1.InvalidEmailOrPasswordException());
                         }
+                        if (!(userToAttempt.activated || isFirstLogin))
+                            throw new EmailNotConfirmedException_1.EmailNotConfirmedException();
                         if (isMatch && (userToAttempt.activated || isFirstLogin)) {
                             this.logger.log(`${loginAttempt.email} logged in successfully!`);
                             resolve(this.createJwtPayload(userToAttempt));
                         }
                         else {
                             this.logger.log(`Login of user ${loginAttempt.email} failed!`);
-                            resolve(new common_1.UnauthorizedException());
+                            reject(new InvalidEmailOrPasswordException_1.InvalidEmailOrPasswordException());
                         }
                     }
                     catch (error) {
-                        resolve(new common_1.UnauthorizedException());
+                        reject(error);
                     }
                 });
             });

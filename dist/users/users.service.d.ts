@@ -1,3 +1,4 @@
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { MailService } from './../mail/mail.service';
 import { ModuleRef } from '@nestjs/core';
 import { ConfigService } from './../config/config.service';
@@ -15,5 +16,8 @@ export declare class UsersService {
     onModuleInit(): void;
     create(createUserDto: CreateUserDto): Promise<unknown>;
     findOneByEmail(email: any): Promise<User>;
+    sendEmailConfirmationLink(email: string): Promise<void>;
+    updatePassword(updateUserDto: UpdatePasswordDto): Promise<boolean>;
+    sendForgotEmailPassword(email: string): Promise<void>;
     activateUser(email: string): Promise<boolean>;
 }
