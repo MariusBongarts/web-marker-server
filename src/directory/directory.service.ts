@@ -34,7 +34,9 @@ export class DirectoryService {
   async createDirectory(user: JwtPayload, directory: Directory) {
     const createdDirectory = new this.directoryModel(directory);
     createdDirectory._user = user._id;
-    return await createdDirectory.save();
+    directory = await createdDirectory.save();
+    await this.tagsService.createTagForDirectory(user, directory);
+    return directory;
   }
 
   /**
