@@ -36,7 +36,7 @@ AuthModule = __decorate([
                     return ({
                         secretOrPrivateKey: configService.get('JWT_KEY'),
                         signOptions: {
-                            expiresIn: 360000
+                            expiresIn: 36000000
                         }
                     });
                 }),
