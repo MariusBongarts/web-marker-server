@@ -47,5 +47,10 @@ export class UsersController {
         await this.usersService.sendEmailConfirmationLink(email);
     }
 
+    @Get('/resend-email-confirmation')
+    async resendRemailConfirmationGet(@Query('email') email: string) {
+        await this.usersService.sendEmailConfirmationLink(email);
+    }
+
 
 }
