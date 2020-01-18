@@ -30,8 +30,6 @@ export class MailService {
     body {
       margin: 0;
       padding: 0;
-      color: white;
-      background-color: #3d4455;
       height: 100vh;
     }
 
