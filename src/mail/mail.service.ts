@@ -52,18 +52,6 @@ export class MailService {
       width: 100%;
       text-align: center;
     }
-
-    span {
-      font-size: 1.1em;
-      width: 100%;
-      text-align: center;
-    }
-
-    a {
-      text-decoration: none;
-      color: #92ffaa !important;
-      font-weight: bold;
-    }
   </style>
   <body>
     <div class="container">
